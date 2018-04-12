@@ -1,0 +1,44 @@
+{
+    "name": "unitconverter",
+    "displayName": "UnitConverter",
+    "description": "Converts CSS units",
+    "version": "1.4.0",
+    "publisher": "DiegoMolina",
+    "engines": {
+        "vscode": "^1.18.0"
+    },
+    "repository": {
+        "url": "https://github.com/DracotMolver/UnitConverter"
+    },
+    "icon": "images/unitimg.png",
+    "bugs": {
+        "url": "https://github.com/DracotMolver/UnitConverter",
+        "email": "dracotm25@gmail.com"
+    },
+    "categories": [
+        "Other"
+    ],
+    "activationEvents": [
+        "onCommand:extension.unitConverter"
+    ],
+    "main": "./extension",
+    "contributes": {
+        "commands": [
+            {
+                "command": "extension.unitConverter",
+                "title": "Unit Converter"
+            }
+        ]
+    },
+    "scripts": {
+        "postinstall": "node ./node_modules/vscode/bin/install",
+        "test": "node ./node_modules/vscode/bin/test"
+    },
+    "devDependencies": {
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.6",
+        "eslint": "^4.11.0",
+        "@types/node": "^7.0.43",
+        "@types/mocha": "^2.2.42"
+    }
+}
