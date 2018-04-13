@@ -17,7 +17,7 @@ The extension will work too with colours names such as **black**, **white**, **a
 
 To use **Unit Converter** you have to press down `F1` and type `unit converter`.
 You will get a list of units (**px, em, #, rgb, rgba**). Then, it will appear an input box where you have to type or set the value to convert.
-Finally, you will get a prompt with the new value.
+Finally, you will get a promptt with the new value.
 
 ![Unit Converter](images/unit-01.gif)
 
