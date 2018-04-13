@@ -1,17 +1,21 @@
 const {
-    ExtensionContext,
+    // ExtensionContext,
     commands,
     window,
-    Range,
-    Position
+    // Range,
+    // Position
 } = require('vscode');
-
-const {
-    activeTextEditor
-} = window;
 
 // let Converter = require('./converter').Converter
 // let colorValues = require('./colours/colours');
+const units = require('./helpers/units');
+const {
+    PLACE_HOLDER_INPUT,
+    // PLACE_HOLDER_PROMPT,
+    // CONVERTED_VALUE,
+    ERROR_INPUT,
+    ERROR_PROMPT
+} = require('./constants/strings');
 
 function activate(context) {
     // let newTextContent = '';
@@ -33,23 +37,46 @@ function activate(context) {
     //     'rem': new RegExp("[\\.\\d]+rem"),
     // }
 
-    // // Para el input que solicita valores
-    // const units = [
-    //     { label: 'px', description: 'Pixels' },
-    //     { label: 'em | rem', description: 'M' },
-    //     { label: '#', description: 'Hexadecimal' },
-    //     { label: 'rgb', description: 'Red Green Blue' },
-    //     { label: 'rgba', description: 'Red Green Blue Alpha' },
-    //     { label: 'color', description: 'Color value (e.g white)' }
-    // ];
 
     // const getValueAndUnit = text => text.match(/rgb\(|rgba\(|rem|em|px|#/g);
 
     let command = commands.registerCommand('extension.unitConverter', () => {
-        // Usar activeTextEditiro.selections ya que devuelve uno o más elementos seleccionados
-        // selection = window.activeTextEditor.selections;
+        // Use the activeTextEditiro.selections because it returns one or more selected text
+        const selections = window.activeTextEditor.selections;
 
-        // Si son distintos significa se ha seleccionado un elemento
+        // If the start line and end line are differents it means it was selected some text.
+        // To make sure of this we use also start character and end character
+        const start = selections[0].start;
+        const end = selections[0].end;
+        if (start.line !== end.line || start.character !== end.character) {
+
+        } else {
+            // It displays the input prompt to type the units manually
+            window.showQuickPick(units, {
+                matchOnDescription: true,
+                placeHolder: PLACE_HOLDER_INPUT
+            }).then(resolve => {
+                console.log(resolve);
+                // if (resolve) {
+                //     // Displays the input prompt to get the values
+                //     window.showInputBox({
+                //         prompt: PLACE_HOLDER_PROMPTTt,
+                //         value: ''
+                //     }).then(resolve => {
+                //         if (resolve) {
+                //             // Removes the units in case it was entered
+                //             // Converter.value = resolve.toLowerCase().trim().replace(/rem|px|em|#|rgb/ig, '');
+                //             // Converter.setType(resolve.label.toLowerCase());
+                //             window.showInformationMessage(CONVERTED_VALUE);
+                //         }
+                //     }, reject => {
+                //         window.showErrorMessage(ERROR_PROMPTTt);
+                //     });
+                // }
+            }, reject => {
+                window.showErrorMessage(ERROR_INPUT);
+            });
+        }
         // if (selection[0].start.line !== selection[0].end.line ||
         //     selection[0].start.character !== selection[0].end.character) {
 
@@ -134,34 +161,6 @@ function activate(context) {
         //             builder.replace(selection[0], newTextContent);
         //         }
         //     }).then(() => { }).catch(() => { });
-        // }
-        // else {
-        //     // Desplegar listado de posibles unidades a convertir
-        //     // Desde qué unidad
-        //     window.showQuickPick(units, {
-        //         matchOnDescription: true,
-        //         placeHolder: 'Convert unit from:'
-        //     })
-        //         .then(resolve => {
-        //             if (resolve) {
-        //                 // Desplegar un input para recibir el valor a convertir
-        //                 window.showInputBox({
-        //                     prompt: 'Set the value to convert:',
-        //                     value: ''
-        //                 }).then(resolve => {
-        //                     if (resolve) {
-        //                         // Limpiar el valor en caso de que la persona
-        //                         // ingrese el valor junto con la unidad
-        //                         Converter.value = resolve.toLowerCase().trim().replace(/rem|px|em|#|rgb/ig, '');
-        //                         Converter.setType(resolve.label.toLowerCase());
-        //                         window.showInformationMessage(`The value is ${Converter.value}`);
-        //                     }
-        //                 });
-        //             }
-        //         })
-        //         .catch(error => {
-        //             console.log(error)
-        //         });
         // }
     });
 
