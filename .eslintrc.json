@@ -1,4 +1,5 @@
 {
+    "extends": "airbnb-base",
     "env": {
         "browser": false,
         "commonjs": true,
@@ -11,13 +12,20 @@
         },
         "sourceType": "module"
     },
+    "plugins": [
+        "mocha"
+    ],
     "rules": {
+        "mocha/no-exclusive-tests": "error",
         "no-const-assign": "warn",
         "no-this-before-super": "warn",
         "no-undef": "warn",
         "no-unreachable": "warn",
         "no-unused-vars": "warn",
         "constructor-super": "warn",
-        "valid-typeof": "warn"
+        "valid-typeof": "warn",
+        "arrow-parens": "off",
+        "indent": "off",
+        "comma-dangle": "off"
     }
 }
