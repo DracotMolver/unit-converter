@@ -1,61 +1,85 @@
-const hexToRgb = val => {
-    // Dividir el valor exadecimal en las siguientes posibles formas
-    // Si son tres = [f, f, f]
-    // Si son seis = [ff, ff, ff]
-    let hex = val.length > 3 ? val.match(/[a-f0-9]{2}/g) : val.split('');
-    let rgba = [];
+/**
+ * @author Diego Alberto Molina Vera
+ * @copyright 2016 - 2018
+ */
 
-    for (let index = 0, size = hex.length; index < size; index++) {
-        rgba.push(
-            parseInt(hex[index].length > 1
-                ? hex[index]
-                : `${hex[index]}${hex[index]}`, 16).toString()
-        );
-    }
+// const hexToRgb = val => {
+//     // Dividir el valor exadecimal en las siguientes posibles formas
+//     // Si son tres = [f, f, f]
+//     // Si son seis = [ff, ff, ff]
+//     let hex = val.length > 3 ? val.match(/[a-f0-9]{2}/g) : val.split('');
+//     let rgba = [];
 
-    rgba = rgba.join(', ');
-    return `rgba(${rgba}, 1) | rgb(${rgba})`;
-};
+//     for (let index = 0, size = hex.length; index < size; index++) {
+//         rgba.push(
+//             parseInt(hex[index].length > 1
+//                 ? hex[index]
+//                 : `${hex[index]}${hex[index]}`, 16).toString()
+//         );
+//     }
 
-const rgbToHex = val => {
-    let strInt = 0;
-    let hex = [];
+//     rgba = rgba.join(', ');
+//     return `rgba(${rgba}, 1) | rgb(${rgba})`;
+// };
 
-    // Elminar los parentecis del valor y convertir el string en un array
-    // Como la conversión es a hexadecimal de 6 dígitos (omitiendo el alpha)
-    // el valor es independiente de este, osea si se pasa un valor rgba el
-    // array resultante será de largo 4 (útlimo valor el alpha), debiendo eliminar el último
-    let rgb = val.replace(/[rgba\(\);]+/g, '').split(',');
+// const rgbToHex = val => {
+//     let strInt = 0;
+//     let hex = [];
 
-    for (let index = 0, size = rgb.length; index < size; index++) {
-        strInt = Number(rgb[index].trim());
+//     // Elminar los parentecis del valor y convertir el string en un array
+//     // Como la conversión es a hexadecimal de 6 dígitos (omitiendo el alpha)
+//     // el valor es independiente de este, osea si se pasa un valor rgba el
+//     // array resultante será de largo 4 (útlimo valor el alpha), debiendo eliminar el último
+//     let rgb = val.replace(/[rgba\(\);]+/g, '').split(',');
 
-        hex.push(
-            strInt < 10 ? `0${strInt}` : strInt.toString(16)
-        );
-    }
+//     for (let index = 0, size = rgb.length; index < size; index++) {
+//         strInt = Number(rgb[index].trim());
 
-    if (hex.length > 3) hex.pop();
+//         hex.push(
+//             strInt < 10 ? `0${strInt}` : strInt.toString(16)
+//         );
+//     }
 
-    return `#${hex.join('')}`;
-};
+//     if (hex.length > 3) hex.pop();
 
-const pxToEm = val => `${Number(val, 10) / 16}em`;
+//     return `#${hex.join('')}`;
+// };
 
-const emToPx = val => `${Math.round(parseFloat(val) * 16)}px`;
+const pxToEm = content => `${Math.round((Number(content) / 16) * 1000) / 1000}em`;
+/* -=test=- This is only for testing -=test=- */
+const TEST_pxToEm = pxToEm;
 
-let Converter = {
-    value: '',
-    setType: function (_type) {
-        switch (_type) {
-            case '#': this.value = hexToRgb(this.value.toLowerCase()); break;
-            case 'rgb':
-            case 'rgba': this.value = rgbToHex(this.value.toLowerCase()); break;
-            case 'px': this.value = pxToEm(this.value.toLowerCase()); break;
-            case 'em':
-            case 'rem': this.value = emToPx(this.value.toLowerCase()); break;
+/* -=test=- This is only for testing -=test=- */
+const TEST_cleanUnits = content => content.replace(/(rem|px|em|#|rgb|rgba)/g, '');
+
+// const emToPx = val => `${Math.round(parseFloat(val) * 16)}px`;
+
+const Converter = Object.freeze({
+    convert: (content, convertTo) => {
+        const contentToConvert = content.toLowerCase().trim();
+        switch (convertTo) {
+            case 'px':
+                return pxToEm(contentToConvert);
+            default:
+                return null;
         }
     }
-}
+    // convertTo: to => {
+    //     switch (_type) {
+    // case '#':
+    //     return hexadecimalToRgb(this.value.toLowerCase()); break;
+    //         case '#': this.value = hexToRgb(this.value.toLowerCase()); break;
+    //         case 'rgb':
+    //         case 'rgba': this.value = rgbToHex(this.value.toLowerCase()); break;
+    //         case 'em':
+    //         case 'rem': this.value = emToPx(this.value.toLowerCase()); break;
+    //     }
+    // }
+});
 
-exports.Converter = Converter
+module.exports = {
+    Converter,
+    // -== test ==-
+    TEST_cleanUnits,
+    TEST_pxToEm
+};
