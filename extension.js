@@ -1,3 +1,8 @@
+/**
+ * @author Diego Alberto Molina Vera
+ * @copyright 2016 - 2018
+ */
+
 const {
     // ExtensionContext,
     commands,
@@ -6,13 +11,13 @@ const {
     // Position
 } = require('vscode');
 
-// let Converter = require('./converter').Converter
+const Converter = require('./converter');
 // let colorValues = require('./colours/colours');
 const units = require('./helpers/units');
 const {
     PLACE_HOLDER_INPUT,
-    // PLACE_HOLDER_PROMPT,
-    // CONVERTED_VALUE,
+    PLACE_HOLDER_PROMPT,
+    CONVERTED_VALUE,
     ERROR_INPUT,
     ERROR_PROMPT
 } = require('./constants/strings');
@@ -40,14 +45,13 @@ function activate(context) {
 
     // const getValueAndUnit = text => text.match(/rgb\(|rgba\(|rem|em|px|#/g);
 
-    let command = commands.registerCommand('extension.unitConverter', () => {
+    const command = commands.registerCommand('extension.unitConverter', () => {
         // Use the activeTextEditiro.selections because it returns one or more selected text
-        const selections = window.activeTextEditor.selections;
+        const { selections } = window.activeTextEditor;
 
         // If the start line and end line are differents it means it was selected some text.
         // To make sure of this we use also start character and end character
-        const start = selections[0].start;
-        const end = selections[0].end;
+        const { start, end } = selections[0];
         if (start.line !== end.line || start.character !== end.character) {
 
         } else {
@@ -55,25 +59,25 @@ function activate(context) {
             window.showQuickPick(units, {
                 matchOnDescription: true,
                 placeHolder: PLACE_HOLDER_INPUT
-            }).then(resolve => {
-                console.log(resolve);
-                // if (resolve) {
-                //     // Displays the input prompt to get the values
-                //     window.showInputBox({
-                //         prompt: PLACE_HOLDER_PROMPTTt,
-                //         value: ''
-                //     }).then(resolve => {
-                //         if (resolve) {
-                //             // Removes the units in case it was entered
-                //             // Converter.value = resolve.toLowerCase().trim().replace(/rem|px|em|#|rgb/ig, '');
-                //             // Converter.setType(resolve.label.toLowerCase());
-                //             window.showInformationMessage(CONVERTED_VALUE);
-                //         }
-                //     }, reject => {
-                //         window.showErrorMessage(ERROR_PROMPTTt);
-                //     });
-                // }
-            }, reject => {
+            }).then(unit => {
+                if (unit) {
+                    // Displays the input prompt to get the values
+                    window.showInputBox({
+                        prompt: PLACE_HOLDER_PROMPT,
+                        value: ''
+                    }).then(value => {
+                        if (value) {
+                            // Removes the units in case it was entered
+
+                            // Converter.value = resolve.toLowerCase().trim().replace(/rem|px|em|#|rgb/ig, '');
+                            // Converter.setType(resolve.label.toLowerCase());
+                            window.showInformationMessage(CONVERTED_VALUE);
+                        }
+                    }, () => {
+                        window.showErrorMessage(ERROR_PROMPT);
+                    });
+                }
+            }, () => {
                 window.showErrorMessage(ERROR_INPUT);
             });
         }
