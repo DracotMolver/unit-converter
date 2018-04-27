@@ -22,6 +22,8 @@ const {
     PLACE_HOLDER_PROMPT
 } = require('./../constants/strings');
 
+// -================= // =================-
+
 describe('Extension Tests', () => {
     it('Executes the commmand extension', done => {
         commands.executeCommand('extension.unitConverter')
@@ -79,7 +81,7 @@ describe('Extension Tests', () => {
             }
         });
 
-        xit('Selects `em|rem` from the input prompt', done => {
+        it('Selects `em|rem` from the input prompt', done => {
             const { selections } = window.activeTextEditor;
             const { start, end } = selections[0];
 
@@ -104,7 +106,7 @@ describe('Extension Tests', () => {
             }
         });
 
-        xit('Selects `#` from the input prompt', done => {
+        it('Selects `#` from the input prompt', done => {
             const { selections } = window.activeTextEditor;
             const { start, end } = selections[0];
 
@@ -129,7 +131,7 @@ describe('Extension Tests', () => {
             }
         });
 
-        xit('Selects `rgb` from the input prompt', done => {
+        it('Selects `rgb` from the input prompt', done => {
             const { selections } = window.activeTextEditor;
             const { start, end } = selections[0];
 
@@ -154,7 +156,7 @@ describe('Extension Tests', () => {
             }
         });
 
-        xit('Selects `rgba` from the input prompt', done => {
+        it('Selects `rgba` from the input prompt', done => {
             const { selections } = window.activeTextEditor;
             const { start, end } = selections[0];
 
@@ -179,7 +181,7 @@ describe('Extension Tests', () => {
             }
         });
 
-        xit('Selects `color` from the input prompt', done => {
+        it('Selects `color` from the input prompt', done => {
             const { selections } = window.activeTextEditor;
             const { start, end } = selections[0];
 
