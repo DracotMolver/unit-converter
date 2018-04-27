@@ -3,56 +3,101 @@
  * @copyright 2016 - 2018
  */
 
-// const hexToRgb = val => {
-//     // Dividir el valor exadecimal en las siguientes posibles formas
-//     // Si son tres = [f, f, f]
-//     // Si son seis = [ff, ff, ff]
-//     let hex = val.length > 3 ? val.match(/[a-f0-9]{2}/g) : val.split('');
-//     let rgba = [];
+/**
+ * Converts from hexadecimal to rgb or rgba
+ *
+ * @param {string} content
+ */
+const hexToRgb = content => {
+    const rgba = [];
 
-//     for (let index = 0, size = hex.length; index < size; index++) {
-//         rgba.push(
-//             parseInt(hex[index].length > 1
-//                 ? hex[index]
-//                 : `${hex[index]}${hex[index]}`, 16).toString()
-//         );
-//     }
+    // divide the value in the next possible ways
+    // 3 => [f, f, f]
+    // 6 => [ff, ff, ff]
+    const hexadecimal = content.length > 3
+        ? content.match(/[a-f\d]{2}/g)
+        : content;
 
-//     rgba = rgba.join(', ');
-//     return `rgba(${rgba}, 1) | rgb(${rgba})`;
-// };
+    for (let index = 0, size = hexadecimal.length; index < size; index += 1) {
+        rgba.push(
+            parseInt( // Parse the number or the letter using 16 base
+                hexadecimal[index].length === 2
+                    ? hexadecimal[index]
+                    : `${hexadecimal[index]}${hexadecimal[index]}`,
+                16
+            ).toString()
+        );
+    }
 
-// const rgbToHex = val => {
-//     let strInt = 0;
-//     let hex = [];
+    const rgbOrRgba = rgba.join(', ');
+    return `rgba(${rgbOrRgba}, 1) | rgb(${rgbOrRgba})`;
+};
+/* -=test=- This is only for testing -=test=- */
+const TEST_hexToRgb = hexToRgb;
 
-//     // Elminar los parentecis del valor y convertir el string en un array
-//     // Como la conversión es a hexadecimal de 6 dígitos (omitiendo el alpha)
-//     // el valor es independiente de este, osea si se pasa un valor rgba el
-//     // array resultante será de largo 4 (útlimo valor el alpha), debiendo eliminar el último
-//     let rgb = val.replace(/[rgba\(\);]+/g, '').split(',');
+/**
+ * Converts from rgb or rgba to hexadecimals
+ *
+ * @param {string} content
+ */
+const rgbToHex = content => {
+    let strInt = 0;
+    let hexadecimal = [];
 
-//     for (let index = 0, size = rgb.length; index < size; index++) {
-//         strInt = Number(rgb[index].trim());
+    // Remove the parenthesis of the value and convert the value into an array
+    // As the convertion is to hexadecimal of 6 digits we need to avoid the alpha
+    // channel
+    // /\b(rgb|rgba)(\(.+\)|;)+/g
+    const rgb = content.replace(')', '').split(',');
+    if (rgb.length === 4) {
+        rgb.pop();
+    }
 
-//         hex.push(
-//             strInt < 10 ? `0${strInt}` : strInt.toString(16)
-//         );
-//     }
+    for (let index = 0, size = rgb.length; index < size; index += 1) {
+        strInt = Number(rgb[index]);
 
-//     if (hex.length > 3) hex.pop();
+        hexadecimal.push(
+            strInt < 10 ? `0${strInt}` : strInt.toString(16)
+        );
+    }
 
-//     return `#${hex.join('')}`;
-// };
+    // check if the pairs of hexadecimals values can be minified
+    // [ff, ff, ff]
+    const [a, b, c, ...rest] = hexadecimal;
+    if (a[0] === a[1] && b[0] === b[1] && c[0] === c[1]) {
+        hexadecimal = [a[0], b[0], c[0], ...rest];
+    }
 
+    return `#${hexadecimal.join('')}`;
+};
+/* -=test=- This is only for testing -=test=- */
+const TEST_rgbToHex = rgbToHex;
+
+/**
+ * Converts from em or rem to pixels
+ * @param {string} content
+ */
+const emToPx = content => `${Math.round(parseFloat(content) * 16)}px`;
+/* -=test=- This is only for testing -=test=- */
+const TEST_emToPx = emToPx;
+
+/**
+ * Converts from pixels to em or rem (you choose the unit)
+ * @param {string} content
+ */
 const pxToEm = content => `${Math.round((Number(content) / 16) * 1000) / 1000}em`;
 /* -=test=- This is only for testing -=test=- */
 const TEST_pxToEm = pxToEm;
 
+/**
+ * Cleans the units and the `;` characters
+ * This method is use only when the user sets text in the input box
+ *
+ * @param {string} content
+ */
+const cleanUnits = content => content.replace(/(rem|px|em|#|rgb\(|rgba\(|;)/g, '');
 /* -=test=- This is only for testing -=test=- */
-const TEST_cleanUnits = content => content.replace(/(rem|px|em|#|rgb|rgba)/g, '');
-
-// const emToPx = val => `${Math.round(parseFloat(val) * 16)}px`;
+const TEST_cleanUnits = cleanUnits;
 
 const Converter = Object.freeze({
     convert: (content, convertTo) => {
@@ -60,26 +105,27 @@ const Converter = Object.freeze({
         switch (convertTo) {
             case 'px':
                 return pxToEm(contentToConvert);
+            case 'em':
+            case 'rem':
+                return emToPx(contentToConvert);
+            case '#':
+                return hexToRgb(contentToConvert);
+            case 'rgb':
+            case 'rgba':
+                return rgbToHex(contentToConvert);
             default:
                 return null;
         }
     }
-    // convertTo: to => {
-    //     switch (_type) {
-    // case '#':
-    //     return hexadecimalToRgb(this.value.toLowerCase()); break;
-    //         case '#': this.value = hexToRgb(this.value.toLowerCase()); break;
-    //         case 'rgb':
-    //         case 'rgba': this.value = rgbToHex(this.value.toLowerCase()); break;
-    //         case 'em':
-    //         case 'rem': this.value = emToPx(this.value.toLowerCase()); break;
-    //     }
-    // }
 });
 
-module.exports = {
+module.exports = Object.freeze({
     Converter,
+    cleanUnits,
     // -== test ==-
     TEST_cleanUnits,
-    TEST_pxToEm
-};
+    TEST_pxToEm,
+    TEST_emToPx,
+    TEST_hexToRgb,
+    TEST_rgbToHex
+});
