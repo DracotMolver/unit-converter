@@ -26,6 +26,7 @@
         "valid-typeof": "warn",
         "arrow-parens": "off",
         "indent": "off",
-        "comma-dangle": "off"
+        "comma-dangle": "off",
+        "function-paren-newline": "off"
     }
 }
