@@ -3,6 +3,10 @@
  * @copyright 2016 - 2018
  */
 
+// -================= // =================-
+const colors = require('./helpers/colors/colors.json');
+// -================= // =================-
+
 /**
  * Converts from hexadecimal to rgb or rgba
  *
@@ -89,30 +93,35 @@ const pxToEm = content => `${Math.round((Number(content) / 16) * 1000) / 1000}em
 /* -=test=- This is only for testing -=test=- */
 const TEST_pxToEm = pxToEm;
 
+const colorToHex = content => colors[content].toLowerCase();
+/* -=test=- This is only for testing -=test=- */
+const TEST_colorToHex = colorToHex;
+
 /**
  * Cleans the units and the `;` characters
  * This method is use only when the user sets text in the input box
  *
  * @param {string} content
  */
-const cleanUnits = content => content.replace(/(rem|px|em|#|rgb\(|rgba\(|;)/g, '');
+const cleanUnits = content => content.trim().replace(/^(rgb\(|rgba\(|#)|(rem|px|em|;)+$/g, '');
 /* -=test=- This is only for testing -=test=- */
 const TEST_cleanUnits = cleanUnits;
 
 const Converter = Object.freeze({
     convert: (content, convertTo) => {
-        const contentToConvert = content.toLowerCase().trim();
         switch (convertTo) {
             case 'px':
-                return pxToEm(contentToConvert);
+                return pxToEm(content);
             case 'em':
             case 'rem':
-                return emToPx(contentToConvert);
+                return emToPx(content);
             case '#':
-                return hexToRgb(contentToConvert);
+                return hexToRgb(content);
             case 'rgb':
             case 'rgba':
-                return rgbToHex(contentToConvert);
+                return rgbToHex(content);
+            case 'color':
+                return colorToHex(content);
             default:
                 return null;
         }
@@ -127,5 +136,6 @@ module.exports = Object.freeze({
     TEST_pxToEm,
     TEST_emToPx,
     TEST_hexToRgb,
-    TEST_rgbToHex
+    TEST_rgbToHex,
+    TEST_colorToHex
 });
