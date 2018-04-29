@@ -11,7 +11,10 @@ const {
     // Position
 } = require('vscode');
 
-const Converter = require('./converter');
+const {
+    Converter,
+    cleanUnits
+} = require('./converter');
 // let colorValues = require('./colours/colours');
 const units = require('./helpers/units');
 const {
@@ -68,10 +71,10 @@ function activate(context) {
                     }).then(value => {
                         if (value) {
                             // Removes the units in case it was entered
-
-                            // Converter.value = resolve.toLowerCase().trim().replace(/rem|px|em|#|rgb/ig, '');
-                            // Converter.setType(resolve.label.toLowerCase());
-                            window.showInformationMessage(CONVERTED_VALUE);
+                            const content = cleanUnits(value);
+                            const pickedUnit = unit.label === '[em|rem]' ? 'em' : unit.label;
+                            const convertedValue = Converter.convert(content, pickedUnit);
+                            window.showInformationMessage(`${CONVERTED_VALUE}`.replace('$s', convertedValue));
                         }
                     }, () => {
                         window.showErrorMessage(ERROR_PROMPT);
@@ -81,9 +84,6 @@ function activate(context) {
                 window.showErrorMessage(ERROR_INPUT);
             });
         }
-        // if (selection[0].start.line !== selection[0].end.line ||
-        //     selection[0].start.character !== selection[0].end.character) {
-
         //     // Solo para selecciones múltiples o simples.
         //     // Cualquiera de las dos es siempre en una sola línea.
         //     // De lo contrario no es iSingleLine y abarca un texto completo (más de una línea).
