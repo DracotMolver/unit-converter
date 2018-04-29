@@ -12,6 +12,7 @@ const {
     TEST_emToPx,
     TEST_hexToRgb,
     TEST_rgbToHex,
+    TEST_colorToHex,
     Converter
 } = require('./../converter');
 
@@ -94,5 +95,18 @@ describe('Converter module', () => {
         assert(Converter.convert(TEST_cleanUnits(passed01), 'rgb') === '#fff');
         assert(Converter.convert(TEST_cleanUnits(passed02), 'rgba') === '#6f6');
         assert(Converter.convert(TEST_cleanUnits(passed03), 'rgb') === '#e6e600');
+    });
+
+    it('Converts from `Color` to `hexadecimal`', () => {
+        const passed = 'yellowgreen';
+
+        // after had been cleaned
+        assert(TEST_colorToHex(passed) === '#9acd32');
+
+        // clean in case is not type as expected
+        assert(TEST_colorToHex(passed) === '#9acd32');
+
+        // using as expected
+        assert(Converter.convert(passed, 'color') === '#9acd32');
     });
 });

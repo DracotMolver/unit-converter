@@ -23,8 +23,38 @@ const {
 } = require('./../constants/strings');
 
 // -================= // =================-
+const getQuickPick = () =>
+    window.showQuickPick(units, {
+        matchOnDescription: true,
+        placeHolder: PLACE_HOLDER_INPUT
+    });
+
+const getInputBox = () =>
+    window.showInputBox({
+        prompt: PLACE_HOLDER_PROMPT,
+        value: ''
+    });
+
+const getUnitAt = position => {
+    const { label, description } = units[position];
+
+    return {
+        label,
+        description
+    };
+};
+
+const isNotTextSelected = () => {
+    const { selections } = window.activeTextEditor;
+    const { start, end } = selections[0];
+
+    return start.line === end.line || start.character === end.character;
+};
+
+// -================= // =================-
 
 describe('Extension Tests', () => {
+
     it('Executes the commmand extension', done => {
         commands.executeCommand('extension.unitConverter')
             .then(() => {
@@ -37,29 +67,15 @@ describe('Extension Tests', () => {
 
     describe('Input prompt actions', () => {
         it('Selects `px` from the input prompt and add a value to convert', done => {
-            const { selections } = window.activeTextEditor;
-            const { start, end } = selections[0];
-
-            if (start.line === end.line || start.character === end.character) {
+            if (isNotTextSelected()) {
                 const showQuickPick = sinon.stub(window, 'showQuickPick');
                 const showInputBox = sinon.stub(window, 'showInputBox');
 
-                showQuickPick.resolves({
-                    label: units[0].label,
-                    description: units[0].description
-                });
+                showQuickPick.resolves(getUnitAt(0));
+                const quickPick = getQuickPick();
 
                 showInputBox.resolves('19px');
-
-                const quickPick = window.showQuickPick(units, {
-                    matchOnDescription: true,
-                    placeHolder: PLACE_HOLDER_INPUT
-                });
-
-                const inputBox = window.showInputBox({
-                    prompt: PLACE_HOLDER_PROMPT,
-                    value: ''
-                });
+                const inputBox = getInputBox();
 
                 Promise.all([quickPick, inputBox])
                     .then(resolve => {
@@ -81,129 +97,167 @@ describe('Extension Tests', () => {
             }
         });
 
-        it('Selects `em|rem` from the input prompt', done => {
-            const { selections } = window.activeTextEditor;
-            const { start, end } = selections[0];
-
-            if (start.line === end.line || start.character === end.character) {
+        it('Selects `em|rem` from the input prompt and add a value', done => {
+            if (isNotTextSelected()) {
                 const showQuickPick = sinon.stub(window, 'showQuickPick');
+                const showInputBox = sinon.stub(window, 'showInputBox');
 
-                showQuickPick.resolves({
-                    label: units[1].label,
-                    description: units[1].description
-                });
+                showQuickPick.resolves(getUnitAt(1));
+                const quickPick = getQuickPick();
 
-                const pxTest = window.showQuickPick(units, {
-                    matchOnDescription: true,
-                    placeHolder: PLACE_HOLDER_INPUT
-                }).then(resolve => {
-                    assert(resolve.label === '[em|rem]');
-                    assert(resolve.description === 'M');
-                    assert(showQuickPick.calledOnce);
-                    showQuickPick.restore();
-                    done();
-                });
+                showInputBox.resolves('1.188em');
+                const inputBox = getInputBox();
+
+                Promise.all([quickPick, inputBox])
+                    .then(resolve => {
+                        [pick, input] = resolve;
+
+                        assert(pick.label === '[em|rem]');
+                        assert(pick.description === 'M');
+                        assert(showQuickPick.calledOnce);
+                        showQuickPick.restore();
+
+                        assert(input === '1.188em');
+                        assert(showInputBox.calledOnce);
+                        showInputBox.restore();
+
+                        const result = Converter.convert(
+                            TEST_cleanUnits(input), pick.label === '[em|rem]' && 'em'
+                        );
+                        assert(result === '19px');
+                        done();
+                    });
             }
         });
 
-        it('Selects `#` from the input prompt', done => {
-            const { selections } = window.activeTextEditor;
-            const { start, end } = selections[0];
-
-            if (start.line === end.line || start.character === end.character) {
+        it('Selects `#` from the input prompt and add a value', done => {
+            if (isNotTextSelected()) {
                 const showQuickPick = sinon.stub(window, 'showQuickPick');
+                const showInputBox = sinon.stub(window, 'showInputBox');
 
-                showQuickPick.resolves({
-                    label: units[2].label,
-                    description: units[2].description
-                });
+                showQuickPick.resolves(getUnitAt(2));
+                const quickPick = getQuickPick();
 
-                const pxTest = window.showQuickPick(units, {
-                    matchOnDescription: true,
-                    placeHolder: PLACE_HOLDER_INPUT
-                }).then(resolve => {
-                    assert(resolve.label === '#');
-                    assert(resolve.description === 'Hexadecimal');
-                    assert(showQuickPick.calledOnce);
-                    showQuickPick.restore();
-                    done();
-                });
+                showInputBox.resolves('#f1f1f1');
+                const inputBox = getInputBox();
+
+                Promise.all([quickPick, inputBox])
+                    .then(resolve => {
+                        [pick, input] = resolve;
+
+                        assert(pick.label === '#');
+                        assert(pick.description === 'Hexadecimal');
+                        assert(showQuickPick.calledOnce);
+                        showQuickPick.restore();
+
+                        assert(input === '#f1f1f1');
+                        assert(showInputBox.calledOnce);
+                        showInputBox.restore();
+
+                        const result = Converter.convert(
+                            TEST_cleanUnits(input), pick.label
+                        );
+                        assert(result === 'rgba(241, 241, 241, 1) | rgb(241, 241, 241)');
+                        done();
+                    });
             }
         });
 
         it('Selects `rgb` from the input prompt', done => {
-            const { selections } = window.activeTextEditor;
-            const { start, end } = selections[0];
-
-            if (start.line === end.line || start.character === end.character) {
+            if (isNotTextSelected()) {
                 const showQuickPick = sinon.stub(window, 'showQuickPick');
+                const showInputBox = sinon.stub(window, 'showInputBox');
 
-                showQuickPick.resolves({
-                    label: units[3].label,
-                    description: units[3].description
-                });
+                showQuickPick.resolves(getUnitAt(3));
+                const quickPick = getQuickPick();
 
-                const pxTest = window.showQuickPick(units, {
-                    matchOnDescription: true,
-                    placeHolder: PLACE_HOLDER_INPUT
-                }).then(resolve => {
-                    assert(resolve.label === 'rgb');
-                    assert(resolve.description === 'Red Green Blue');
-                    assert(showQuickPick.calledOnce);
-                    showQuickPick.restore();
-                    done();
-                });
+                showInputBox.resolves('rgb(137, 94, 173)');
+                const inputBox = getInputBox();
+
+                Promise.all([quickPick, inputBox])
+                    .then(resolve => {
+                        [pick, input] = resolve;
+
+                        assert(pick.label === 'rgb');
+                        assert(pick.description === 'Red Green Blue');
+                        assert(showQuickPick.calledOnce);
+                        showQuickPick.restore();
+
+                        assert(input === 'rgb(137, 94, 173)');
+                        assert(showInputBox.calledOnce);
+                        showInputBox.restore();
+
+                        const result = Converter.convert(
+                            TEST_cleanUnits(input), pick.label
+                        );
+                        assert(result === '#895ead');
+                        done();
+                    });
             }
         });
 
         it('Selects `rgba` from the input prompt', done => {
-            const { selections } = window.activeTextEditor;
-            const { start, end } = selections[0];
-
-            if (start.line === end.line || start.character === end.character) {
+            if (isNotTextSelected()) {
                 const showQuickPick = sinon.stub(window, 'showQuickPick');
+                const showInputBox = sinon.stub(window, 'showInputBox');
 
-                showQuickPick.resolves({
-                    label: units[4].label,
-                    description: units[4].description
-                });
+                showQuickPick.resolves(getUnitAt(4));
+                const quickPick = getQuickPick();
 
-                const pxTest = window.showQuickPick(units, {
-                    matchOnDescription: true,
-                    placeHolder: PLACE_HOLDER_INPUT
-                }).then(resolve => {
-                    assert(resolve.label === 'rgba');
-                    assert(resolve.description === 'Red Green Blue Alpha');
-                    assert(showQuickPick.calledOnce);
-                    showQuickPick.restore();
-                    done();
-                });
+                showInputBox.resolves('rgb(137, 94, 173, 1)');
+                const inputBox = getInputBox();
+
+                Promise.all([quickPick, inputBox])
+                    .then(resolve => {
+                        [pick, input] = resolve;
+
+                        assert(pick.label === 'rgba');
+                        assert(pick.description === 'Red Green Blue Alpha');
+                        assert(showQuickPick.calledOnce);
+                        showQuickPick.restore();
+
+                        assert(input === 'rgb(137, 94, 173, 1)');
+                        assert(showInputBox.calledOnce);
+                        showInputBox.restore();
+
+                        const result = Converter.convert(
+                            TEST_cleanUnits(input), pick.label
+                        );
+                        assert(result === '#895ead');
+                        done();
+                    });
             }
         });
 
         it('Selects `color` from the input prompt', done => {
-            const { selections } = window.activeTextEditor;
-            const { start, end } = selections[0];
-
-            if (start.line === end.line || start.character === end.character) {
+            if (isNotTextSelected()) {
                 const showQuickPick = sinon.stub(window, 'showQuickPick');
+                const showInputBox = sinon.stub(window, 'showInputBox');
 
-                showQuickPick.resolves({
-                    label: units[5].label,
-                    description: units[5].description
-                });
+                showQuickPick.resolves(getUnitAt(5));
+                const quickPick = getQuickPick();
 
-                const pxTest = window.showQuickPick(units, {
-                    matchOnDescription: true,
-                    placeHolder: PLACE_HOLDER_INPUT
-                }).then(resolve => {
-                    assert(resolve.label === 'color');
-                    assert(resolve.description === 'Color value (e.g. white)');
-                    assert(showQuickPick.calledOnce);
-                    showQuickPick.restore();
-                    done();
-                });
+                showInputBox.resolves('white');
+                const inputBox = getInputBox();
+
+                Promise.all([quickPick, inputBox])
+                    .then(resolve => {
+                        [pick, input] = resolve;
+
+                        assert(pick.label === 'color');
+                        assert(pick.description === 'Color value (e.g. white)');
+                        assert(showQuickPick.calledOnce);
+                        showQuickPick.restore();
+
+                        assert(input === 'white');
+                        assert(showInputBox.calledOnce);
+                        showInputBox.restore();
+                        const result = Converter.convert(input, pick.label);
+                        assert(result === '#fff');
+                        done();
+                    });
             }
         });
+
     });
 });
