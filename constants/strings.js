@@ -5,5 +5,6 @@ module.exports = {
 
     // Error messages
     ERROR_INPUT: 'There was an error trying to execute this action',
-    ERROR_PROMPT: 'There was an error trying to convert a unit'
+    ERROR_PROMPT: 'There was an error trying to convert a unit',
+    ERROR_SELECTED_TEXT: 'Please, check if you have selected the right values.'
 };
