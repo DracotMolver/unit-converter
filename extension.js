@@ -15,25 +15,26 @@ const {
     Converter,
     cleanUnits
 } = require('./converter');
-// let colorValues = require('./colours/colours');
+const colorValues = require('./helpers/colors/colors');
 const units = require('./helpers/units');
 const {
     PLACE_HOLDER_INPUT,
     PLACE_HOLDER_PROMPT,
     CONVERTED_VALUE,
     ERROR_INPUT,
-    ERROR_PROMPT
+    ERROR_PROMPT,
+    ERROR_SELECTED_TEXT
 } = require('./constants/strings');
 
 function activate(context) {
     // let newTextContent = '';
-    // let textToInspect = '';
+    let textToInspect = '';
     // let textContent = '';
     // let selection = [];
-    // let matches = [];
-    // let values = [];
-    // let start = 0;
-    // let end = 0;
+    let foundUnits = [];
+    let convertedValues = [];
+    let startPosition = 0;
+    let endPosition = 0;
 
     // // Expresiones a evaluar cuando se selecciona mucho texto.
     // const regex = {
@@ -48,15 +49,72 @@ function activate(context) {
 
     // const getValueAndUnit = text => text.match(/rgb\(|rgba\(|rem|em|px|#/g);
 
+    /**
+     * It will get all the content selected one by one and transform their opposite value
+     *
+     * @param {object} selection - object will several values
+     * @param {function} lineAt - It will get the content at the specified line.
+     */
+    const processSingleLine = (selection, lineAt) => {
+        const { start, end, active } = selection;
+        startPosition = start.character;
+        endPosition = end.character;
+        textToInspect = lineAt(active.line).text.slice(startPosition, endPosition).trim();
+
+        // Check if the selecte text has a known unit. Except for colors
+        // They are not considered as units
+        if (/^(rgb\(|rgba\(|#)|(rem|px|em|;)+$/g.test(textToInspect)) {
+            foundUnits = textToInspect.match(/^(rgb\(|rgba\(|#)|(rem|px|em)+$/g);
+            foundUnits.forEach(foundUnit => {
+                convertedValues.push(
+                    Converter.convert(
+                        cleanUnits(textToInspect),
+                        foundUnit.replace('(', '')
+                    )
+                );
+            });
+        } else if (colorValues[textToInspect]) {
+            convertedValues.push(
+                Converter.convert(
+                    textToInspect,
+                    'color'
+                )
+            );
+        } else {
+            convertedValues.push(textToInspect);
+            window.showErrorMessage(ERROR_SELECTED_TEXT);
+        }
+    };
+
     const command = commands.registerCommand('extension.unitConverter', () => {
         // Use the activeTextEditiro.selections because it returns one or more selected text
-        const { selections } = window.activeTextEditor;
+        const { selections, document } = window.activeTextEditor;
+        const { start, end, isSingleLine } = selections[0];
 
         // If the start line and end line are differents it means it was selected some text.
         // To make sure of this we use also start character and end character
-        const { start, end } = selections[0];
         if (start.line !== end.line || start.character !== end.character) {
+            // Only for multiple selection or one selection onto a singleline
+            if (isSingleLine) {
+                convertedValues = [];
+                const { lineAt } = document;
+                selections.forEach(selection => processSingleLine(selection, lineAt));
+            }
 
+            // Replace the selected text by the new values
+            window.activeTextEditor.edit(builder => {
+                if (isSingleLine) {
+                    // specified the correct position of the texts to replace
+                    for (let index = 0, size = selections.length; index < size; index += 1) {
+                        builder.replace(selections[index], convertedValues[index]);
+                    }
+                }
+            });
+            //         if (selection[0].isSingleLine) {
+            //         } else {
+            //             builder.replace(selection[0], newTextContent);
+            //         }
+            //     }).then(() => { }).catch(() => { });
         } else {
             // It displays the input prompt to type the units manually
             window.showQuickPick(units, {
@@ -87,38 +145,6 @@ function activate(context) {
         //     // Solo para selecciones múltiples o simples.
         //     // Cualquiera de las dos es siempre en una sola línea.
         //     // De lo contrario no es iSingleLine y abarca un texto completo (más de una línea).
-        //     if (selection[0].isSingleLine) {
-        //         values = [];
-        //         selection.forEach(v => {
-        //             start = v.start.character;
-        //             end = v.end.character;
-        //             textToInspect = activeTextEditor.document.lineAt(v.active.line).text.slice(start, end).trim();
-
-        //             // Validar si se está seleccionando una unidad conocida.
-        //             // De ser así, saltarse el paso de preguntar desde "qué unidad va a transformar"
-        //             // Para llevar luego a "a qué unidad va a convertir", de lo contrario mostrar mensaje de alerta.
-        //             if (/rgb|rgba|rem|em|px|#/g.test(textToInspect) &&
-        //                 (matches = getValueAndUnit(textToInspect))) {
-
-        //                 // Más de una unidad en una misma línea
-        //                 if (matches.length > 1) {
-        //                     console.log(matches);
-        //                 } else {
-        //                     // Pasamos el valor sin el tipo
-        //                     matches[0] = matches[0].replace('(', '');
-        //                     Converter.value = textToInspect.replace(matches[0], '');
-        //                     Converter.setType(matches[0]);
-        //                     values.push(Converter.value);
-        //                 }
-
-        //             } else if (colorValues[textToInspect]) {
-        //                 // Solo para los palabras con nombre de color
-        //                 values.push(colorValues[textToInspect]);
-        //             } else {
-        //                 window.showErrorMessage('Please, check if you have selected the right values.');
-        //             }
-        //         });
-        //     } else {
         //         const textRange = new Range(
         //             selection[0].start.line,
         //             selection[0].start.character,
@@ -156,15 +182,6 @@ function activate(context) {
         //         newTextContent = textContent.join("\n");
         //     }
 
-        //     // Reemplazar el texto seleccionado por el valor nuevo
-        //     activeTextEditor.edit(builder => {
-        //         if (selection[0].isSingleLine) {
-        //             for (var i = 0, size = selection.length; i < size; i++)
-        //                 builder.replace(selection[i], values[i]);
-        //         } else {
-        //             builder.replace(selection[0], newTextContent);
-        //         }
-        //     }).then(() => { }).catch(() => { });
         // }
     });
 
