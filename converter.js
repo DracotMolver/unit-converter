@@ -4,7 +4,7 @@
  */
 
 // -================= // =================-
-const colors = require('./helpers/colors/colors.json');
+const colors = require('./helpers/colors/colors');
 // -================= // =================-
 
 /**
