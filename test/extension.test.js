@@ -54,7 +54,6 @@ const isNotTextSelected = () => {
 // -================= // =================-
 
 describe('Extension Tests', () => {
-
     it('Executes the commmand extension', done => {
         commands.executeCommand('extension.unitConverter')
             .then(() => {
@@ -79,7 +78,7 @@ describe('Extension Tests', () => {
 
                 Promise.all([quickPick, inputBox])
                     .then(resolve => {
-                        [pick, input] = resolve;
+                        const [pick, input] = resolve;
 
                         assert(pick.label === 'px');
                         assert(pick.description === 'Pixels');
@@ -110,7 +109,7 @@ describe('Extension Tests', () => {
 
                 Promise.all([quickPick, inputBox])
                     .then(resolve => {
-                        [pick, input] = resolve;
+                        const [pick, input] = resolve;
 
                         assert(pick.label === '[em|rem]');
                         assert(pick.description === 'M');
@@ -143,7 +142,7 @@ describe('Extension Tests', () => {
 
                 Promise.all([quickPick, inputBox])
                     .then(resolve => {
-                        [pick, input] = resolve;
+                        const [pick, input] = resolve;
 
                         assert(pick.label === '#');
                         assert(pick.description === 'Hexadecimal');
@@ -176,7 +175,7 @@ describe('Extension Tests', () => {
 
                 Promise.all([quickPick, inputBox])
                     .then(resolve => {
-                        [pick, input] = resolve;
+                        const [pick, input] = resolve;
 
                         assert(pick.label === 'rgb');
                         assert(pick.description === 'Red Green Blue');
@@ -209,7 +208,7 @@ describe('Extension Tests', () => {
 
                 Promise.all([quickPick, inputBox])
                     .then(resolve => {
-                        [pick, input] = resolve;
+                        const [pick, input] = resolve;
 
                         assert(pick.label === 'rgba');
                         assert(pick.description === 'Red Green Blue Alpha');
@@ -242,7 +241,7 @@ describe('Extension Tests', () => {
 
                 Promise.all([quickPick, inputBox])
                     .then(resolve => {
-                        [pick, input] = resolve;
+                        const [pick, input] = resolve;
 
                         assert(pick.label === 'color');
                         assert(pick.description === 'Color value (e.g. white)');
@@ -258,6 +257,5 @@ describe('Extension Tests', () => {
                     });
             }
         });
-
     });
 });
