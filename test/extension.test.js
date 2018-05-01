@@ -22,38 +22,39 @@ const {
     PLACE_HOLDER_PROMPT
 } = require('./../constants/strings');
 
-// -================= // =================-
-const getQuickPick = () =>
-    window.showQuickPick(units, {
-        matchOnDescription: true,
-        placeHolder: PLACE_HOLDER_INPUT
-    });
-
-const getInputBox = () =>
-    window.showInputBox({
-        prompt: PLACE_HOLDER_PROMPT,
-        value: ''
-    });
-
-const getUnitAt = position => {
-    const { label, description } = units[position];
-
-    return {
-        label,
-        description
-    };
-};
-
-const isNotTextSelected = () => {
-    const { selections } = window.activeTextEditor;
-    const { start, end } = selections[0];
-
-    return start.line === end.line || start.character === end.character;
-};
-
-// -================= // =================-
 
 describe('Extension Tests', () => {
+    // -================= // =================-
+    const getQuickPick = () =>
+        window.showQuickPick(units, {
+            matchOnDescription: true,
+            placeHolder: PLACE_HOLDER_INPUT
+        });
+
+    const getInputBox = () =>
+        window.showInputBox({
+            prompt: PLACE_HOLDER_PROMPT,
+            value: ''
+        });
+
+    const getUnitAt = position => {
+        const { label, description } = units[position];
+
+        return {
+            label,
+            description
+        };
+    };
+
+    const isNotTextSelected = () => {
+        const { selections } = window.activeTextEditor;
+        const { start, end } = selections[0];
+
+        return start.line === end.line || start.character === end.character;
+    };
+
+    // -================= // =================-
+
     it('Executes the commmand extension', done => {
         commands.executeCommand('extension.unitConverter')
             .then(() => {
