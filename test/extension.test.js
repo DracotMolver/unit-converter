@@ -22,7 +22,6 @@ const {
     PLACE_HOLDER_PROMPT
 } = require('./../constants/strings');
 
-
 describe('Extension Tests', () => {
     // -================= // =================-
     const getQuickPick = () =>
@@ -49,7 +48,6 @@ describe('Extension Tests', () => {
     const isNotTextSelected = () => {
         const { selections } = window.activeTextEditor;
         const { start, end } = selections[0];
-
         return start.line === end.line || start.character === end.character;
     };
 
