@@ -6,7 +6,7 @@ Unit converter will work like this:
 * From: **px** to **em** and **em** to **px**
 * From: **Hex** ('#') to **rgb | rgba** and **rgb | rgba** to **Hex**
 
->**Important:** Don't remove the unit from the text you are setting into the input bar or you are selecting. It's important to know from which unit are you going to convert.
+>**Important:** Don't remove the unit from the text you are selecting on the actived text editor. It's important to know from which unit are you going to convert.
 
 The extension will work too with colors names such as **black**, **white**, **aquamarine**, **yellowgreen** and so on; converting all of them to their hexadecimal value
 
