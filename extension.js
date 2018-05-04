@@ -7,7 +7,7 @@ const {
     // ExtensionContext,
     commands,
     window,
-    // Range,
+    Range,
     // Position
 } = require('vscode');
 
@@ -27,10 +27,13 @@ const {
 } = require('./constants/strings');
 
 function activate(context) {
-    // let newTextContent = '';
     let textToInspect = '';
-    // let textContent = '';
-    // let selection = [];
+
+    // When is a range of text.
+    let textRange;
+    let linesOfText = [];
+
+    // When is a single piece of text or multiple selections
     let foundUnits = [];
     let convertedValues = [];
     let startPosition = 0;
@@ -46,13 +49,95 @@ function activate(context) {
     //     'rem': new RegExp("[\\.\\d]+rem"),
     // }
 
+    /**
+     * Checks if there's any unit in the line
+     *
+     * @param {string} textContent - Text to check
+     * @return {boolean}
+     */
+    const isUnitsExits = textContent =>
+        /#[a-f\d]{3,6}|(rgb|rgba)\(|\d+px|[\.\d]+(rem|em)/ig.test(textContent);
 
-    // const getValueAndUnit = text => text.match(/rgb\(|rgba\(|rem|em|px|#/g);
+    /**
+     * It will get all the values in one line to convert
+     *
+     * @param {string} textContent - Text to find if it has any value to convert
+     * @return {array} - An array of objects {key[units]: value[value]}
+     */
+    const getValuesAndUnits = textContent => {
+        const unitsAndvalues = [];
+
+        // Get all the values that could be converted
+        const values = textContent.match(
+            /#[a-f\d]{3,6}|(rgb|rgba)\([\d\.,\s]+\)|\d+px|[\.\d]+(rem|em)/ig
+        );
+
+        // Find the unit and makes and array of objects
+        // {
+        //   unit: '#',
+        //   value: '000'
+        // }
+        values.forEach(value => {
+            const unit = value.trim().match(/^((rgb|rgba)|#)|(rem|px|em)+$/);
+
+            unitsAndvalues.push({
+                unit,
+                value
+            });
+        });
+
+        return unitsAndvalues;
+    };
+
+    const processSelectedRangeText = (selection, document) => {
+        const { start, end } = selection;
+
+        // Get all the contenet from the selection
+        textRange = new Range(
+            start.line,
+            start.character,
+            end.line,
+            end.character
+        );
+        textToInspect = document.getText(textRange);
+
+        // Pass every single line of text to an array to go over it
+        // to avoid to overwrite what has been replaced.
+        linesOfText = textToInspect.replace(/\r/g, '').split('\n');
+
+        for (let index = 0, size = linesOfText.length; index < size; index += 1) {
+            if (isUnitsExits(linesOfText[index])) {
+                foundUnits = getValuesAndUnits(linesOfText[index]);
+            }
+        }
+
+        //                 // Más de una unidad en una misma línea
+        //                 if (matches.length > 1) {
+        //                     continue;
+        //                 } else {
+        //                     matches[0] = matches[0].replace('(', '');
+        //                     textToInspect = textContent[index].match(regex[matches[0]]);
+
+        //                     // Pasamos el valor sin el tipo
+        //                     Converter.value = textToInspect[0].replace(matches[0], '');
+        //                     Converter.setType(matches[0]);
+        //                     textContent[index] = textContent[index].replace(textToInspect[0], Converter.value);
+        //                 }
+        //             }
+        //         }
+
+        //         newTextContent = textContent.join("\n");
+        //     }
+
+        // }
+
+    };
+
 
     /**
      * It will get all the content selected one by one and transform their opposite value
      *
-     * @param {object} selection - object will several values
+     * @param {object} selection - An object will several values
      * @param {function} lineAt - It will get the content at the specified line.
      */
     const processSingleLine = (selection, lineAt) => {
@@ -63,8 +148,8 @@ function activate(context) {
 
         // Check if the selecte text has a known unit. Except for colors
         // They are not considered as units
-        if (/^(rgb\(|rgba\(|#)|(rem|px|em|;)+$/g.test(textToInspect)) {
-            foundUnits = textToInspect.match(/^(rgb\(|rgba\(|#)|(rem|px|em)+$/g);
+        if (/^(rgb\(|rgba\(|#)|(rem|px|em|;)+$/.test(textToInspect)) {
+            foundUnits = textToInspect.match(/^((rgb|rgba)\(|#)|(rem|px|em)+$/);
             foundUnits.forEach(foundUnit => {
                 convertedValues.push(
                     Converter.convert(
@@ -99,6 +184,11 @@ function activate(context) {
                 convertedValues = [];
                 const { lineAt } = document;
                 selections.forEach(selection => processSingleLine(selection, lineAt));
+            } else {
+                // Here is when the selection includes a long piece of code
+                // Not single elements selected one by one or just one element
+                // selected
+                processSelectedRangeText(selections, document);
             }
 
             // Replace the selected text by the new values
@@ -110,8 +200,6 @@ function activate(context) {
                     }
                 }
             });
-            //         if (selection[0].isSingleLine) {
-            //         } else {
             //             builder.replace(selection[0], newTextContent);
             //         }
             //     }).then(() => { }).catch(() => { });
@@ -142,47 +230,6 @@ function activate(context) {
                 window.showErrorMessage(ERROR_INPUT);
             });
         }
-        //     // Solo para selecciones múltiples o simples.
-        //     // Cualquiera de las dos es siempre en una sola línea.
-        //     // De lo contrario no es iSingleLine y abarca un texto completo (más de una línea).
-        //         const textRange = new Range(
-        //             selection[0].start.line,
-        //             selection[0].start.character,
-        //             selection[0].end.line,
-        //             selection[0].end.character
-        //         );
-
-        //         textContent = activeTextEditor.document.getText(textRange);
-        //         // let _e = [];
-        //         // Pasar cada línea del texto obtenido a un array para reccorrer línea por lína,
-        //         // así evitar que se sobre escriba lo que ya ha sido reemplazado.
-        //         textContent = textContent.replace(/\r/g, '').split("\n");
-
-        //         for (let index = 0, size = textContent.length; index < size; index++) {
-        //             if (
-        //                 /#[a-f0-9]{3,6}|rgba\([\d,\s\.]+\)|rgb\([\d,\s]+\)|\d+px|[\.\d]+em|[\.\d]+rem/ig.test(textContent[index])
-        //             ) {
-
-        //                 matches = getValueAndUnit(textContent[index]);
-        //                 // Más de una unidad en una misma línea
-        //                 if (matches.length > 1) {
-        //                     continue;
-        //                 } else {
-        //                     matches[0] = matches[0].replace('(', '');
-        //                     textToInspect = textContent[index].match(regex[matches[0]]);
-
-        //                     // Pasamos el valor sin el tipo
-        //                     Converter.value = textToInspect[0].replace(matches[0], '');
-        //                     Converter.setType(matches[0]);
-        //                     textContent[index] = textContent[index].replace(textToInspect[0], Converter.value);
-        //                 }
-        //             }
-        //         }
-
-        //         newTextContent = textContent.join("\n");
-        //     }
-
-        // }
     });
 
     context.subscriptions.push(command);
