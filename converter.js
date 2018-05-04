@@ -5,12 +5,14 @@
 
 // -================= // =================-
 const colors = require('./helpers/colors/colors');
+
 // -================= // =================-
 
 /**
  * Converts from hexadecimal to rgb or rgba
  *
- * @param {string} content
+ * @param {string} content - The text to convert
+ * @return {string} - It returns the next structure `rgba() | rgb()`;
  */
 const hexToRgb = content => {
     const rgba = [];
@@ -36,13 +38,12 @@ const hexToRgb = content => {
     const rgbOrRgba = rgba.join(', ');
     return `rgba(${rgbOrRgba}, 1) | rgb(${rgbOrRgba})`;
 };
-/* -=test=- This is only for testing -=test=- */
-const TEST_hexToRgb = hexToRgb;
 
 /**
  * Converts from rgb or rgba to hexadecimals
  *
- * @param {string} content
+ * @param {string} content - The content to convert
+ * @return {string} - Returns the next structure `#[hexadecimal]`;
  */
 const rgbToHex = content => {
     let strInt = 0;
@@ -74,39 +75,42 @@ const rgbToHex = content => {
 
     return `#${hexadecimal.join('')}`;
 };
-/* -=test=- This is only for testing -=test=- */
-const TEST_rgbToHex = rgbToHex;
 
 /**
  * Converts from em or rem to pixels
- * @param {string} content
+ *
+ * @param {string} content - The content to convert
+ * @return {string} - Returns the next structure `[number]px`
  */
 const emToPx = content => `${Math.round(parseFloat(content) * 16)}px`;
-/* -=test=- This is only for testing -=test=- */
-const TEST_emToPx = emToPx;
 
 /**
  * Converts from pixels to em or rem (you choose the unit)
- * @param {string} content
+ *
+ * @param {string} content - The content to convert
+ * @return {string} - Returns the next structure `[number]em`
  */
 const pxToEm = content => `${Math.round((Number(content) / 16) * 1000) / 1000}em`;
-/* -=test=- This is only for testing -=test=- */
-const TEST_pxToEm = pxToEm;
 
+/**
+ * Get the color equivalent on hexadecimals
+ *
+ * @param {string} content - The colour name
+ * @return {string} - The hexadecimal equivalent
+ */
 const colorToHex = content => colors[content].toLowerCase();
-/* -=test=- This is only for testing -=test=- */
-const TEST_colorToHex = colorToHex;
 
 /**
  * Cleans the units and the `;` characters
  * This method is use only when the user sets text in the input box
  *
- * @param {string} content
+ * @param {string} content - The content to convert
+ * @return {string} - Returns the content cleaned
  */
-const cleanUnits = content => content.trim().replace(/^(rgb\(|rgba\(|#)|(rem|px|em|;)+$/g, '');
-/* -=test=- This is only for testing -=test=- */
-const TEST_cleanUnits = cleanUnits;
+const cleanUnits = content => content.trim().replace(/^((rgb|rgba)\(|#)|(rem|px|em|;)+$/g, '');
 
+
+// -================= // =================-
 const Converter = Object.freeze({
     convert: (content, convertTo) => {
         switch (convertTo) {
@@ -132,10 +136,10 @@ module.exports = Object.freeze({
     Converter,
     cleanUnits,
     // -== test ==-
-    TEST_cleanUnits,
-    TEST_pxToEm,
-    TEST_emToPx,
-    TEST_hexToRgb,
-    TEST_rgbToHex,
-    TEST_colorToHex
+    TEST_cleanUnits: cleanUnits,
+    TEST_pxToEm: pxToEm,
+    TEST_emToPx: emToPx,
+    TEST_hexToRgb: hexToRgb,
+    TEST_rgbToHex: rgbToHex,
+    TEST_colorToHex: colorToHex
 });
