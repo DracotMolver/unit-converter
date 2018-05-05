@@ -2,7 +2,7 @@
     "name": "unitconverter",
     "displayName": "UnitConverter",
     "description": "Converts CSS units",
-    "version": "1.4.0",
+    "version": "1.5.0",
     "publisher": "DiegoMolina",
     "engines": {
         "vscode": "^1.18.0"
