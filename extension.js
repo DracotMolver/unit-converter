@@ -4,11 +4,9 @@
  */
 
 const {
-    // ExtensionContext,
     commands,
     window,
-    Range,
-    // Position
+    Range
 } = require('vscode');
 
 const {
@@ -32,22 +30,13 @@ function activate(context) {
     // When is a range of text.
     let textRange;
     let linesOfText = [];
+    let convertedRangeText = '';
 
     // When is a single piece of text or multiple selections
     let foundUnits = [];
     let convertedValues = [];
     let startPosition = 0;
     let endPosition = 0;
-
-    // // Expresiones a evaluar cuando se selecciona mucho texto.
-    // const regex = {
-    //     '#': new RegExp("#[\\d\\w]{3,6}"),
-    //     'rgba': new RegExp("rgba\\([\\d,\\s\\.]+\\)"),
-    //     'rgb': new RegExp("rgb\\([\\d,\\s]+\\)"),
-    //     'px': new RegExp("\\d+px"),
-    //     'em': new RegExp("[\\.\\d]+em"),
-    //     'rem': new RegExp("[\\.\\d]+rem"),
-    // }
 
     /**
      * Checks if there's any unit in the line
@@ -78,7 +67,7 @@ function activate(context) {
         //   value: '000'
         // }
         values.forEach(value => {
-            const unit = value.trim().match(/^((rgb|rgba)|#)|(rem|px|em)+$/);
+            const unit = value.trim().match(/^((rgb|rgba)\(|#)|(rem|px|em)+$/)[0];
 
             unitsAndvalues.push({
                 unit,
@@ -89,6 +78,13 @@ function activate(context) {
         return unitsAndvalues;
     };
 
+    /**
+     * It will process a range of text selected, not item one by one.
+     * It means a range of text selected with the cursor.
+     *
+     * @param {object} selection - An object will several values
+     * @param {object} document - The actual document where we are workin on
+     */
     const processSelectedRangeText = (selection, document) => {
         const { start, end } = selection;
 
@@ -105,34 +101,33 @@ function activate(context) {
         // to avoid to overwrite what has been replaced.
         linesOfText = textToInspect.replace(/\r/g, '').split('\n');
 
-        for (let index = 0, size = linesOfText.length; index < size; index += 1) {
-            if (isUnitsExits(linesOfText[index])) {
-                foundUnits = getValuesAndUnits(linesOfText[index]);
-            }
-        }
+        linesOfText
+            .map((lines, index) => {
+                if (isUnitsExits(lines)) {
+                    return {
+                        position: index,
+                        text: lines
+                    };
+                }
 
-        //                 // Más de una unidad en una misma línea
-        //                 if (matches.length > 1) {
-        //                     continue;
-        //                 } else {
-        //                     matches[0] = matches[0].replace('(', '');
-        //                     textToInspect = textContent[index].match(regex[matches[0]]);
+                return null;
+            })
+            .filter(lines => lines)
+            .forEach(lines => {
+                getValuesAndUnits(lines.text)
+                    .forEach(foundLine => {
+                        const convertedValue = Converter.convert(
+                            cleanUnits(foundLine.value),
+                            foundLine.unit.replace('(', '')
+                        );
 
-        //                     // Pasamos el valor sin el tipo
-        //                     Converter.value = textToInspect[0].replace(matches[0], '');
-        //                     Converter.setType(matches[0]);
-        //                     textContent[index] = textContent[index].replace(textToInspect[0], Converter.value);
-        //                 }
-        //             }
-        //         }
+                        linesOfText[lines.position] = linesOfText[lines.position]
+                            .replace(foundLine.value, convertedValue);
+                    });
+            });
 
-        //         newTextContent = textContent.join("\n");
-        //     }
-
-        // }
-
+        return linesOfText.join('\n');
     };
-
 
     /**
      * It will get all the content selected one by one and transform their opposite value
@@ -188,7 +183,7 @@ function activate(context) {
                 // Here is when the selection includes a long piece of code
                 // Not single elements selected one by one or just one element
                 // selected
-                processSelectedRangeText(selections, document);
+                convertedRangeText = processSelectedRangeText(selections[0], document);
             }
 
             // Replace the selected text by the new values
@@ -198,11 +193,10 @@ function activate(context) {
                     for (let index = 0, size = selections.length; index < size; index += 1) {
                         builder.replace(selections[index], convertedValues[index]);
                     }
+                } else {
+                    builder.replace(selections[0], convertedRangeText);
                 }
             });
-            //             builder.replace(selection[0], newTextContent);
-            //         }
-            //     }).then(() => { }).catch(() => { });
         } else {
             // It displays the input prompt to type the units manually
             window.showQuickPick(units, {
