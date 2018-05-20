@@ -147,18 +147,12 @@ function activate(context) {
             foundUnits = textToInspect.match(/^((rgb|rgba)\(|#)|(rem|px|em)+$/);
             foundUnits.forEach(foundUnit => {
                 convertedValues.push(
-                    Converter.convert(
-                        cleanUnits(textToInspect),
-                        foundUnit.replace('(', '')
-                    )
+                    Converter.convert(cleanUnits(textToInspect), foundUnit.replace('(', ''))
                 );
             });
         } else if (colorValues[textToInspect]) {
             convertedValues.push(
-                Converter.convert(
-                    textToInspect,
-                    'color'
-                )
+                Converter.convert(textToInspect, 'color')
             );
         } else {
             convertedValues.push(textToInspect);
@@ -190,7 +184,8 @@ function activate(context) {
             window.activeTextEditor.edit(builder => {
                 if (isSingleLine) {
                     // specified the correct position of the texts to replace
-                    for (let index = 0, size = selections.length; index < size; index += 1) {
+                    const size = selections.length;
+                    for (let index = 0; index < size; index += 1) {
                         builder.replace(selections[index], convertedValues[index]);
                     }
                 } else {

@@ -24,7 +24,8 @@ const hexToRgb = content => {
         ? content.match(/[a-f\d]{2}/g)
         : content;
 
-    for (let index = 0, size = hexadecimal.length; index < size; index += 1) {
+    const size = hexadecimal.length;
+    for (let index = 0; index < size; index += 1) {
         rgba.push(
             parseInt( // Parse the number or the letter using 16 base
                 hexadecimal[index].length === 2
@@ -58,7 +59,8 @@ const rgbToHex = content => {
         rgb.pop();
     }
 
-    for (let index = 0, size = rgb.length; index < size; index += 1) {
+    const size = rgb.length;
+    for (let index = 0; index < size; index += 1) {
         strInt = Number(rgb[index]);
 
         hexadecimal.push(
@@ -113,22 +115,17 @@ const cleanUnits = content => content.trim().replace(/^((rgb|rgba)\(|#)|(rem|px|
 // -================= // =================-
 const Converter = Object.freeze({
     convert: (content, convertTo) => {
-        switch (convertTo) {
-            case 'px':
-                return pxToEm(content);
-            case 'em':
-            case 'rem':
-                return emToPx(content);
-            case '#':
-                return hexToRgb(content);
-            case 'rgb':
-            case 'rgba':
-                return rgbToHex(content);
-            case 'color':
-                return colorToHex(content);
-            default:
-                return null;
-        }
+        const objFunc = {
+            px: pxToEm,
+            em: emToPx,
+            rem: emToPx,
+            '#': hexToRgb,
+            rgb: rgbToHex,
+            rgba: rgbToHex,
+            color: colorToHex
+        };
+
+        return objFunc[convertTo](content) || null;
     }
 });
 
