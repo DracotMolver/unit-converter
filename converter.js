@@ -4,7 +4,7 @@
  */
 
 // -================= // =================-
-const colors = require('./helpers/colors/colors');
+const colors = require('./helpers/colors');
 
 // -================= // =================-
 
@@ -15,29 +15,23 @@ const colors = require('./helpers/colors/colors');
  * @return {string} - It returns the next structure `rgba() | rgb()`;
  */
 const hexToRgb = content => {
-    const rgba = [];
-
     // divide the value in the next possible ways
     // 3 => [f, f, f]
     // 6 => [ff, ff, ff]
     const hexadecimal = content.length > 3
         ? content.match(/[a-f\d]{2}/g)
-        : content;
+        : content.split('');
 
-    const size = hexadecimal.length;
-    for (let index = 0; index < size; index += 1) {
-        rgba.push(
-            parseInt( // Parse the number or the letter using 16 base
-                hexadecimal[index].length === 2
-                    ? hexadecimal[index]
-                    : `${hexadecimal[index]}${hexadecimal[index]}`,
-                16
-            ).toString()
-        );
-    }
+    const rgba = hexadecimal.map(value =>
+        parseInt( // Parse the number or the letter using 16 base
+            value.length === 2
+                ? value
+                : `${value}${value}`,
+            16
+        ).toString()
+    ).join(', ');
 
-    const rgbOrRgba = rgba.join(', ');
-    return `rgba(${rgbOrRgba}, 1) | rgb(${rgbOrRgba})`;
+    return `rgba(${rgba}, 1) | rgb(${rgba})`;
 };
 
 /**
@@ -59,14 +53,10 @@ const rgbToHex = content => {
         rgb.pop();
     }
 
-    const size = rgb.length;
-    for (let index = 0; index < size; index += 1) {
-        strInt = Number(rgb[index]);
-
-        hexadecimal.push(
-            strInt < 10 ? `0${strInt}` : strInt.toString(16)
-        );
-    }
+    hexadecimal = rgb.map(value => {
+        strInt = Number(value);
+        return strInt < 10 ? `0${strInt}` : strInt.toString(16);
+    });
 
     // check if the pairs of hexadecimals values can be minified
     // [ff, ff, ff]
