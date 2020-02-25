@@ -24,7 +24,7 @@ const {
     CONVERTED_VALUE,
     ERROR_INPUT,
     ERROR_PROMPT
-} = require('./constants/strings');
+} = require('./helpers/constants/strings');
 
 function activate(context) {
     // When is a range of text.
@@ -62,7 +62,7 @@ function activate(context) {
                 // Here is when the selection includes a long piece of code
                 // Not single elements selected one by one or just one element
                 // selected
-                [selection] = selections;
+                const [selection] = selections;
                 convertedRangeText = processSelectedRangeText(selection, document);
             }
 
@@ -75,7 +75,7 @@ function activate(context) {
                         builder.replace(selections[index], convertedValues[index]);
                     }
                 } else {
-                    [selection] = selections;
+                    const [selection] = selections;
                     builder.replace(selection, convertedRangeText);
                 }
             });

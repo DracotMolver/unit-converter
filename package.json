@@ -2,10 +2,10 @@
     "name": "unitconverter",
     "displayName": "UnitConverter",
     "description": "Converts CSS units",
-    "version": "1.5.1",
+    "version": "1.5.2",
     "publisher": "DiegoMolina",
     "engines": {
-        "vscode": "^1.18.0"
+        "vscode": "^1.42.0"
     },
     "repository": {
         "url": "https://github.com/DracotMolver/UnitConverter"
@@ -31,18 +31,20 @@
         ]
     },
     "scripts": {
-        "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "node ./node_modules/vscode/bin/test"
+        "test": "node ./test/runTest.js"
     },
     "devDependencies": {
-        "@types/mocha": "^5.2.4",
-        "@types/node": "^10.5.1",
-        "eslint": "^5.0.1",
-        "eslint-config-airbnb-base": "^13.0.0",
-        "eslint-plugin-import": "^2.13.0",
-        "eslint-plugin-mocha": "^5.0.0",
-        "sinon": "^6.0.1",
-        "typescript": "^2.9.2",
-        "vscode": "^1.1.18"
+        "@types/glob": "^7.1.1",
+        "@types/mocha": "^7.0.1",
+        "@types/node": "^13.7.4",
+        "@types/vscode": "^1.42.0",
+        "eslint": "^6.8.0",
+        "eslint-config-airbnb-base": "^14.0.0",
+        "eslint-plugin-import": "^2.20.1",
+        "eslint-plugin-mocha": "^6.3.0",
+        "glob": "^7.1.6",
+        "sinon": "^9.0.0",
+        "typescript": "^3.8.2",
+        "vscode-test": "^1.3.0"
     }
 }

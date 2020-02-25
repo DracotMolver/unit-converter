@@ -17,12 +17,12 @@ const {
 const {
     Converter,
     TEST_cleanUnits
-} = require('./../converter');
-const units = require('./../helpers/units');
+} = require('../../converter');
+const units = require('../../helpers/units');
 const {
     PLACE_HOLDER_INPUT,
     PLACE_HOLDER_PROMPT
-} = require('./../constants/strings');
+} = require('../../helpers/constants/strings');
 
 describe('Extension Tests', () => {
     // -================= // =================-

@@ -14,7 +14,7 @@ const {
     TEST_rgbToHex,
     TEST_colorToHex,
     Converter
-} = require('./../converter');
+} = require('../../converter');
 
 // -================= // =================-
 

@@ -16,7 +16,7 @@ const {
 const colorValues = require('./helpers/colors');
 const {
     ERROR_SELECTED_TEXT
-} = require('./constants/strings');
+} = require('./helpers/constants/strings');
 
 // -================= // =================-
 /**
@@ -141,7 +141,7 @@ const processSingleLine = (selection, lineAt) => {
     // Check if the selecte text has a known unit. Except for colors
     // They are not considered as units
     if (/^(rgb\(|rgba\(|#)|(rem|px|em|;)+$/.test(textToInspect)) {
-        [foundUnit] = textToInspect.match(/^((rgb|rgba)\(|#)|(rem|px|em)+$/g);
+        const [foundUnit] = textToInspect.match(/^((rgb|rgba)\(|#)|(rem|px|em)+$/g);
         convertedValues = Converter.convert(cleanUnits(textToInspect), foundUnit.replace('(', ''))
     } else if (colorValues[textToInspect]) {
         convertedValues = Converter.convert(textToInspect, 'color')
