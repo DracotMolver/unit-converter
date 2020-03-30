@@ -1,12 +1,9 @@
 /**
  * @author Diego Alberto Molina Vera
- * @copyright 2016 - 2018
+ * @copyright 2016 - 2020
  */
 
-// -================= // =================-
 const colors = require('./helpers/colors');
-
-// -================= // =================-
 
 /**
  * Converts from hexadecimal to rgb or rgba
@@ -15,20 +12,18 @@ const colors = require('./helpers/colors');
  * @return {string} - It returns the next structure `rgba() | rgb()`;
  */
 const hexToRgb = content => {
-  // divide the value in the next possible ways
   // 3 => [f, f, f]
   // 6 => [ff, ff, ff]
   const hexadecimal = content.length > 3
     ? content.match(/[a-f\d]{2}/g)
     : content.split('');
 
-  const rgba = hexadecimal.map(value =>
-    parseInt( // Parse the number or the letter using 16 base
-      value.length === 2
-        ? value
-        : `${value}${value}`,
-      16
-    ).toString()
+  const rgba = hexadecimal.map(value => String(parseInt(
+    value.length === 2
+      ? value
+      : `${value}${value}`,
+    16
+  ))
   ).join(', ');
 
   return `rgba(${rgba}, 1) | rgb(${rgba})`;
@@ -45,9 +40,7 @@ const rgbToHex = content => {
   let hexadecimal = [];
 
   // Remove the parenthesis of the value and convert the value into an array
-  // As the convertion is to hexadecimal of 6 digits we need to avoid the alpha
-  // channel
-  // /\b(rgb|rgba)(\(.+\)|;)+/g
+  // As it the convertion is to an hexadecimal of 6 digits we need to avoid the alpha channel.
   const rgb = content.replace(')', '').split(',');
   if (rgb.length === 4) {
     rgb.pop();
@@ -102,31 +95,30 @@ const colorToHex = content => colors[content].toLowerCase();
 const cleanUnits = content => content.trim().replace(/^((rgb|rgba)\(|#)|(rem|px|em|;)+$/g, '');
 
 
-// -================= // =================-
-const Converter = Object.freeze({
-  convert: (content, convertTo) => {
-    const objFunc = {
-      px: pxToEm,
-      em: emToPx,
-      rem: emToPx,
-      '#': hexToRgb,
-      rgb: rgbToHex,
-      rgba: rgbToHex,
-      color: colorToHex
-    };
+const objFunc = {
+  color: colorToHex,
+  rgba: rgbToHex,
+  rgb: rgbToHex,
+  '#': hexToRgb,
+  em: emToPx,
+  px: pxToEm,
+  rem: emToPx,
+};
 
+const obj = {
+  cleanUnits,
+  Converter(content, convertTo) {
     return objFunc[convertTo](content) || null;
   }
-});
+};
 
-module.exports = Object.freeze({
-  Converter,
-  cleanUnits,
-  // -== test ==-
-  TEST_cleanUnits: cleanUnits,
-  TEST_pxToEm: pxToEm,
-  TEST_emToPx: emToPx,
-  TEST_hexToRgb: hexToRgb,
-  TEST_rgbToHex: rgbToHex,
-  TEST_colorToHex: colorToHex
-});
+if (process.env.NODE_ENV !== 'production') {
+  obj.colorToHex = colorToHex;
+  obj.hexToRgb = hexToRgb;
+  obj.rgbToHex = rgbToHex;
+  obj.pxToEm = pxToEm;
+  obj.emToPx = emToPx;
+}
+
+module.exports = Object.freeze(obj);
+

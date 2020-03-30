@@ -23,8 +23,8 @@ const {
   PLACE_HOLDER_INPUT,
   PLACE_HOLDER_PROMPT,
   CONVERTED_VALUE,
-  ERROR_INPUT,
-  ERROR_PROMPT
+  ERROR_PROMPT,
+  ERROR_INPUT
 } = require('./helpers/constants/strings');
 
 function activate(context) {
@@ -41,7 +41,7 @@ function activate(context) {
     } = window.activeTextEditor;
 
     // If the start line and end line are differents it means it was selected some text.
-    // To make sure of this we use also start character and end character
+    // To make sure of this, we use start character and end character
     if (start.line !== end.line || start.character !== end.character) {
       let convertedValues = []; // When is a single piece of text or multiple selections
       let convertedRangeText = ''; // When is a range of text.
@@ -87,7 +87,7 @@ function activate(context) {
               // Removes the units in case it was entered
               const content = cleanUnits(value);
               const pickedUnit = unit.label === '[em|rem]' ? 'em' : unit.label;
-              const convertedValue = Converter.convert(content, pickedUnit);
+              const convertedValue = Converter(content, pickedUnit);
               window.showInformationMessage(`${CONVERTED_VALUE}`.replace('$s', convertedValue));
             }
           }, () => {

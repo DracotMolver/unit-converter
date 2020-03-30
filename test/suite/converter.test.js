@@ -7,13 +7,13 @@ const assert = require('assert');
 
 // -================= // =================-
 const {
-  TEST_cleanUnits,
-  TEST_pxToEm,
-  TEST_emToPx,
-  TEST_hexToRgb,
-  TEST_rgbToHex,
-  TEST_colorToHex,
-  Converter
+  cleanUnits,
+  colorToHex,
+  Converter,
+  hexToRgb,
+  rgbToHex,
+  emToPx,
+  pxToEm,
 } = require('../../converter');
 
 // -================= // =================-
@@ -24,14 +24,14 @@ describe('Converter module', () => {
     const expected = '1.188em';
 
     // after had been cleaned
-    assert(TEST_pxToEm(passed) === expected);
+    assert(pxToEm(passed) === expected);
 
     // clean in case is not type as expected
-    assert(TEST_pxToEm(TEST_cleanUnits(`${passed}px;`)) === expected);
-    assert(TEST_pxToEm(TEST_cleanUnits(`    ${passed}px  `)) === expected);
+    assert(pxToEm(cleanUnits(`${passed}px;`)) === expected);
+    assert(pxToEm(cleanUnits(`    ${passed}px  `)) === expected);
 
     // using as expected
-    assert(Converter.convert(TEST_cleanUnits(`${passed}px`), 'px') === expected);
+    assert(Converter(cleanUnits(`${passed}px`), 'px') === expected);
   });
 
   it('Converts from `em|rem` to `px`', () => {
@@ -40,22 +40,22 @@ describe('Converter module', () => {
 
     // em
     // after had been cleaned
-    assert(TEST_emToPx(passed) === expected);
+    assert(emToPx(passed) === expected);
 
     // clean in case is not type as expected
-    assert(TEST_emToPx(TEST_cleanUnits(`${passed}em;`)) === expected);
-    assert(TEST_emToPx(TEST_cleanUnits(`    ${passed}em    `)) === expected);
+    assert(emToPx(cleanUnits(`${passed}em;`)) === expected);
+    assert(emToPx(cleanUnits(`    ${passed}em    `)) === expected);
 
     // using as expected
-    assert(Converter.convert(TEST_cleanUnits(`${passed}em;`), 'em') === expected);
+    assert(Converter(cleanUnits(`${passed}em;`), 'em') === expected);
 
     // rem
     // clean in case is not type as expected
-    assert(TEST_emToPx(TEST_cleanUnits(`${passed}rem;`)) === expected);
-    assert(TEST_emToPx(TEST_cleanUnits(`    ${passed}rem    `)) === expected);
+    assert(emToPx(cleanUnits(`${passed}rem;`)) === expected);
+    assert(emToPx(cleanUnits(`    ${passed}rem    `)) === expected);
 
     // using as expected
-    assert(Converter.convert(TEST_cleanUnits(`${passed}rem;`), 'rem') === expected);
+    assert(Converter(cleanUnits(`${passed}rem;`), 'rem') === expected);
   });
 
   it('Converts from `hexadecimal` to `rgb|rgba`', () => {
@@ -64,18 +64,18 @@ describe('Converter module', () => {
     const expected03 = 'rgba(230, 230, 0, 1) | rgb(230, 230, 0)';
 
     // after had been cleaned
-    assert(TEST_hexToRgb('fff') === expected01);
-    assert(TEST_hexToRgb('ffffff') === expected01);
+    assert(hexToRgb('fff') === expected01);
+    assert(hexToRgb('ffffff') === expected01);
 
     // clean in case is not type as expected
-    assert(TEST_hexToRgb(TEST_cleanUnits('#ffffff;')) === expected01);
-    assert(TEST_hexToRgb(TEST_cleanUnits('   #66ff66  ')) === expected02);
-    assert(TEST_hexToRgb(TEST_cleanUnits('#e6e600')) === expected03);
+    assert(hexToRgb(cleanUnits('#ffffff;')) === expected01);
+    assert(hexToRgb(cleanUnits('   #66ff66  ')) === expected02);
+    assert(hexToRgb(cleanUnits('#e6e600')) === expected03);
 
     // // using as expected
-    assert(Converter.convert(TEST_cleanUnits('#66ff66;'), '#') === expected02);
-    assert(Converter.convert(TEST_cleanUnits('#e6e600;'), '#') === expected03);
-    assert(Converter.convert(TEST_cleanUnits('#6f6;'), '#') === expected02);
+    assert(Converter(cleanUnits('#66ff66;'), '#') === expected02);
+    assert(Converter(cleanUnits('#e6e600;'), '#') === expected03);
+    assert(Converter(cleanUnits('#6f6;'), '#') === expected02);
   });
 
   it('Converts from `rgb|rgba` to `hexadecimal`', () => {
@@ -84,29 +84,29 @@ describe('Converter module', () => {
     const passed03 = 'rgb(230, 230, 0)';
 
     // after had been cleaned
-    assert(TEST_rgbToHex(passed01) === '#fff');
+    assert(rgbToHex(passed01) === '#fff');
 
     // clean in case is not type as expected
-    assert(TEST_rgbToHex(TEST_cleanUnits(passed01)) === '#fff');
-    assert(TEST_rgbToHex(TEST_cleanUnits(passed02)) === '#6f6');
-    assert(TEST_rgbToHex(TEST_cleanUnits(passed03)) === '#e6e600');
+    assert(rgbToHex(cleanUnits(passed01)) === '#fff');
+    assert(rgbToHex(cleanUnits(passed02)) === '#6f6');
+    assert(rgbToHex(cleanUnits(passed03)) === '#e6e600');
 
     // using as expected
-    assert(Converter.convert(TEST_cleanUnits(passed01), 'rgb') === '#fff');
-    assert(Converter.convert(TEST_cleanUnits(passed02), 'rgba') === '#6f6');
-    assert(Converter.convert(TEST_cleanUnits(passed03), 'rgb') === '#e6e600');
+    assert(Converter(cleanUnits(passed01), 'rgb') === '#fff');
+    assert(Converter(cleanUnits(passed02), 'rgba') === '#6f6');
+    assert(Converter(cleanUnits(passed03), 'rgb') === '#e6e600');
   });
 
   it('Converts from `Color` to `hexadecimal`', () => {
     const passed = 'yellowgreen';
 
     // after had been cleaned
-    assert(TEST_colorToHex(passed) === '#9acd32');
+    assert(colorToHex(passed) === '#9acd32');
 
     // clean in case is not type as expected
-    assert(TEST_colorToHex(passed) === '#9acd32');
+    assert(colorToHex(passed) === '#9acd32');
 
     // using as expected
-    assert(Converter.convert(passed, 'color') === '#9acd32');
+    assert(Converter(passed, 'color') === '#9acd32');
   });
 });

@@ -15,8 +15,8 @@ const {
 
 // -================= // =================-
 const {
+  cleanUnits,
   Converter,
-  TEST_cleanUnits
 } = require('../../converter');
 const units = require('../../helpers/units');
 const {
@@ -26,14 +26,12 @@ const {
 
 describe('Extension Tests', () => {
   // -================= // =================-
-  const getQuickPick = () =>
-    window.showQuickPick(units, {
+  const getQuickPick = () => window.showQuickPick(units, {
       matchOnDescription: true,
       placeHolder: PLACE_HOLDER_INPUT
     });
 
-  const getInputBox = () =>
-    window.showInputBox({
+  const getInputBox = () => window.showInputBox({
       prompt: PLACE_HOLDER_PROMPT,
       value: ''
     });
@@ -50,18 +48,12 @@ describe('Extension Tests', () => {
   const isNotTextSelected = () => {
     const {
       selections: [{
-        start: {
-          line: startLine,
-          character: startChar
-        },
-        end: {
-          line: endLine,
-          character: endChar
-        }
+        start,
+        end
       }]
     } = window.activeTextEditor;
 
-    return startLine === endLine || startChar === endChar;
+    return start.line === end.line || start.character === end.character;
   };
 
   // -================= // =================-
@@ -105,7 +97,7 @@ describe('Extension Tests', () => {
                     assert(showInputBox.calledOnce);
                     showInputBox.restore();
 
-                    const result = Converter.convert(TEST_cleanUnits(input), pick.label);
+                    const result = Converter(cleanUnits(input), pick.label);
                     assert(result === '1.188em');
                     done();
                   });
@@ -142,8 +134,8 @@ describe('Extension Tests', () => {
                     assert(showInputBox.calledOnce);
                     showInputBox.restore();
 
-                    const result = Converter.convert(
-                      TEST_cleanUnits(input), pick.label === '[em|rem]' && 'em'
+                    const result = Converter(
+                      cleanUnits(input), pick.label === '[em|rem]' && 'em'
                     );
                     assert(result === '19px');
                     done();
@@ -181,8 +173,8 @@ describe('Extension Tests', () => {
                     assert(showInputBox.calledOnce);
                     showInputBox.restore();
 
-                    const result = Converter.convert(
-                      TEST_cleanUnits(input), pick.label
+                    const result = Converter(
+                      cleanUnits(input), pick.label
                     );
                     assert(result === 'rgba(241, 241, 241, 1) | rgb(241, 241, 241)');
                     done();
@@ -220,8 +212,8 @@ describe('Extension Tests', () => {
                     assert(showInputBox.calledOnce);
                     showInputBox.restore();
 
-                    const result = Converter.convert(
-                      TEST_cleanUnits(input), pick.label
+                    const result = Converter(
+                      cleanUnits(input), pick.label
                     );
                     assert(result === '#895ead');
                     done();
@@ -259,8 +251,8 @@ describe('Extension Tests', () => {
                     assert(showInputBox.calledOnce);
                     showInputBox.restore();
 
-                    const result = Converter.convert(
-                      TEST_cleanUnits(input), pick.label
+                    const result = Converter(
+                      cleanUnits(input), pick.label
                     );
                     assert(result === '#895ead');
                     done();
@@ -297,7 +289,7 @@ describe('Extension Tests', () => {
                     assert(input === 'white');
                     assert(showInputBox.calledOnce);
                     showInputBox.restore();
-                    const result = Converter.convert(input, pick.label);
+                    const result = Converter(input, pick.label);
                     assert(result === '#fff');
                     done();
                   });

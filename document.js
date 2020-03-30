@@ -1,8 +1,10 @@
 /**
  * @author Diego Alberto Molina Vera
- * @copyright 2016 - 2018
+ * @copyright 2016 - 2020
  */
-// -================= // =================-
+
+const os = require('os');
+
 const {
   window,
   Range
@@ -35,7 +37,6 @@ const isUnitsExits = textContent => /#[a-f\d]{3,6}|(rgb|rgba)\(|\d+px|[.\d]+(rem
  * @return {array} - An array of objects {key[units]: value[value]}
  */
 const getValuesAndUnits = textContent => {
-  // Get all the values that could be converted
   const values = textContent.match(
     /#[a-f\d]{3,6}|(rgb|rgba)\([\d.,\s]+\)|\d+px|[.\d]+(rem|em)/ig
   );
@@ -63,23 +64,14 @@ const getValuesAndUnits = textContent => {
  * @param {object} document - The actual document where we are workin on
  */
 const processSelectedRangeText = (selection, document) => {
-  const {
-    start: {
-      line: startLine,
-      character: startChar
-    },
-    end: {
-      line: endLine,
-      character: endChar
-    }
-  } = selection;
+  const { start, end } = selection;
 
   // Get all the contenet from the selection
   const textRange = new Range(
-    startLine,
-    startChar,
-    endLine,
-    endChar
+    start.line,
+    start.character,
+    end.line,
+    end.character
   );
   const textToInspect = document.getText(textRange);
 
@@ -88,21 +80,15 @@ const processSelectedRangeText = (selection, document) => {
   const linesOfText = textToInspect.replace(/\r/g, '').split('\n');
 
   linesOfText
-    .map((lines, index) => {
-      if (isUnitsExits(lines)) {
-        return {
-          position: index,
-          text: lines
-        };
-      }
-
-      return null;
-    })
-    .filter(lines => lines)
+    .filter(lines => isUnitsExits(lines))
+    .map((lines, index) => ({
+      position: index,
+      text: lines
+    }))
     .forEach(lines => {
       getValuesAndUnits(lines.text)
         .forEach(foundLine => {
-          const convertedValue = Converter.convert(
+          const convertedValue = Converter(
             cleanUnits(foundLine.value),
             foundLine.unit.replace('(', '')
           );
@@ -112,7 +98,7 @@ const processSelectedRangeText = (selection, document) => {
         });
     });
 
-  return linesOfText.join('\n');
+  return linesOfText.join(os.EOL);
 };
 
 /**
@@ -132,14 +118,13 @@ const processSingleLine = (selection, lineAt) => {
 
   const textToInspect = lineAt(active.line).text.slice(start.character, end.character).trim();
 
-  // Check if the selecte text has a known unit. Except for colors
-  // They are not considered as units
+  // Check if the selecte text has a known unit.
+  // Except for colors, they are not considered as units.
   if (/^(rgb\(|rgba\(|#)|(rem|px|em|;)+$/.test(textToInspect)) {
-    console.log(textToInspect.match(/^((rgb|rgba)\(|#)|(rem|px|em)+$/g));
     const [foundUnit] = textToInspect.match(/^((rgb|rgba)\(|#)|(rem|px|em)+$/g);
-    convertedValues = Converter.convert(cleanUnits(textToInspect), foundUnit.replace('(', ''));
+    convertedValues = Converter(cleanUnits(textToInspect), foundUnit.replace('(', ''));
   } else if (colorValues[textToInspect]) {
-    convertedValues = Converter.convert(textToInspect, 'color');
+    convertedValues = Converter(textToInspect, 'color');
   } else {
     convertedValues = textToInspect;
     window.showErrorMessage(ERROR_SELECTED_TEXT);
