@@ -1,6 +1,6 @@
 # UnitConverter
 ![logo](https://github.com/DracotMolver/UnitConverter/blob/master/images/unitimg.png)
-[![Build Status](https://travis-ci.org/DracotMolver/UnitConverter.svg?branch=master)](https://travis-ci.org/DracotMolver/UnitConverter)
+[![Build Status](https://travis-ci.org/DracotMolver/unit-converter.svg?branch=master)](https://travis-ci.org/DracotMolver/unit-converter)
 [![Visual Studio Marketplace](https://img.shields.io/vscode-marketplace/d/DiegoMolina.unitconverter.svg)](https://marketplace.visualstudio.com/items?itemName=DiegoMolina.unitconverter)
 [![Visual Studio Marketplace](https://img.shields.io/vscode-marketplace/v/DiegoMolina.unitconverter.svg)](https://marketplace.visualstudio.com/items?itemName=DiegoMolina.unitconverter)
 [![license:mit](https://img.shields.io/badge/license-mit-blue.svg)](https://opensource.org/licenses/MIT)
