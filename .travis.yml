@@ -2,7 +2,7 @@ language: node_js
 os:
   - osx
   - linux
-node_js: 8
+node_js: 10
 
 install:
   - |
@@ -14,4 +14,4 @@ script:
   - |
     echo ">>> Run sample integration test"
     yarn && yarn test
-cache: yarn
+cache: yar
