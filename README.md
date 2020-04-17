@@ -4,6 +4,7 @@
 [![Visual Studio Marketplace](https://img.shields.io/vscode-marketplace/d/DiegoMolina.unitconverter.svg)](https://marketplace.visualstudio.com/items?itemName=DiegoMolina.unitconverter)
 [![Visual Studio Marketplace](https://img.shields.io/vscode-marketplace/v/DiegoMolina.unitconverter.svg)](https://marketplace.visualstudio.com/items?itemName=DiegoMolina.unitconverter)
 [![license:mit](https://img.shields.io/badge/license-mit-blue.svg)](https://opensource.org/licenses/MIT)
+![Snyk Vulnerabilities for GitHub Repo](https://img.shields.io/snyk/vulnerabilities/github/DracotMolver/unit-converter)
 
 ## Just the rights units
 Unit converter will work like this:
