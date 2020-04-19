@@ -40,7 +40,7 @@ function activate(context) {
       document
     } = window.activeTextEditor;
 
-    // If the start line and end line are differents it means it was selected some text.
+    // If the start line and end line are different it means it was selected some text.
     // To make sure of this, we use start character and end character
     if (start.line !== end.line || start.character !== end.character) {
       let convertedValues = []; // When is a single piece of text or multiple selections
