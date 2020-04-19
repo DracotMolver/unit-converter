@@ -3,15 +3,15 @@
  * @copyright 2016 - 2020
  */
 
-const os = require("os");
+const os = require('os');
 
-const { window, Range } = require("vscode");
+const { window, Range } = require('vscode');
 
-const { Converter, cleanUnits } = require("./converter");
+const { Converter, cleanUnits } = require('./converter');
 
-const colorValues = require("./helpers/colors");
+const colorValues = require('./helpers/colors');
 
-const { ERROR_SELECTED_TEXT } = require("./helpers/constants/strings");
+const { ERROR_SELECTED_TEXT } = require('./helpers/constants/strings');
 
 // -================= // =================-
 /**
@@ -20,8 +20,7 @@ const { ERROR_SELECTED_TEXT } = require("./helpers/constants/strings");
  * @param {string} textContent - Text to check
  * @return {boolean}
  */
-const isUnitsExits = (textContent) =>
-  /#[a-f\d]{3,6}|(rgb|rgba)\(|\d+px|[.\d]+(rem|em)/gi.test(textContent);
+const isUnitsExits = (textContent) => /#[a-f\d]{3,6}|(rgb|rgba)\(|\d+px|[.\d]+(rem|em)/gi.test(textContent);
 
 /**
  * It will get all the values in one line to convert
@@ -70,7 +69,7 @@ const processSelectedRangeText = (selection, document) => {
 
   // Pass every single line of text to an array to go over it
   // to avoid to overwrite what has been replaced.
-  const linesOfText = textToInspect.replace(/\r/g, "").split("\n");
+  const linesOfText = textToInspect.replace(/\r/g, '').split('\n');
 
   linesOfText
     .filter((lines) => isUnitsExits(lines))
@@ -82,7 +81,7 @@ const processSelectedRangeText = (selection, document) => {
       getValuesAndUnits(lines.text).forEach((foundLine) => {
         const convertedValue = Converter(
           cleanUnits(foundLine.value),
-          foundLine.unit.replace("(", "")
+          foundLine.unit.replace('(', '')
         );
 
         linesOfText[lines.position] = linesOfText[lines.position].replace(
@@ -102,14 +101,13 @@ const processSelectedRangeText = (selection, document) => {
  * @param {function} lineAt - It will get the content at the specified line.
  */
 const processSingleLine = (selection, lineAt) => {
-  let convertedValues = "";
-
   const { start, end, active } = selection;
 
-  let textToInspect = lineAt(active.line)
+  const textToInspect = lineAt(active.line)
     .text.slice(start.character, end.character)
     .trim();
 
+  let convertedValues = textToInspect;
   // Check if the selected text has a known unit.
   // Except for colors, they are not considered as units.
   if (
@@ -124,18 +122,24 @@ const processSingleLine = (selection, lineAt) => {
         ...prev,
         {
           prevVal: current,
-          newVal: "",
-          unit: current.match(/rgb\(|rgba\(|#|rem|px|em/).replace("(", ""),
+          newVal: '',
+          unit: current.match(/rgb\(|rgba\(|#|rem|px|em/)[0].replace('(', ''),
         },
       ],
       []
     );
 
-    // convertedValues = Converter(cleanUnits(textToInspect), foundUnit.replace('(', ''));
+    valToConvert.forEach((val) => {
+      val.newVal = Converter(cleanUnits(val.prevVal), val.unit);
+
+      convertedValues = convertedValues.replace(
+        new RegExp(val.prevVal, 'g'),
+        val.newVal
+      );
+    });
   } else if (colorValues[textToInspect]) {
-    convertedValues = Converter(textToInspect, "color");
+    convertedValues = Converter(textToInspect, 'color');
   } else {
-    convertedValues = textToInspect;
     window.showErrorMessage(ERROR_SELECTED_TEXT);
   }
 

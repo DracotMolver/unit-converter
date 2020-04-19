@@ -3,7 +3,7 @@
  * @copyright 2016 - 2020
  */
 
-const colors = require("./helpers/colors");
+const colors = require('./helpers/colors');
 
 /**
  * Converts from hexadecimal to rgb or rgba
@@ -14,14 +14,12 @@ const colors = require("./helpers/colors");
 const hexToRgb = (content) => {
   // 3 => [f, f, f]
   // 6 => [ff, ff, ff]
-  const hexadecimal =
-    content.length > 3 ? content.match(/[a-f\d]{2}/g) : content.split("");
+  const hexadecimal = content.length > 3 ? content.match(/[a-f\d]{2}/g) : content.split('');
 
   const rgba = hexadecimal
-    .map((value) =>
-      String(parseInt(value.length === 2 ? value : `${value}${value}`, 16))
+    .map((value) => String(parseInt(value.length === 2 ? value : `${value}${value}`, 16))
     )
-    .join(", ");
+    .join(', ');
 
   return `rgba(${rgba}, 1) | rgb(${rgba})`;
 };
@@ -38,7 +36,7 @@ const rgbToHex = (content) => {
 
   // Remove the parenthesis of the value and convert the value into an array
   // As it the convertion is to an hexadecimal of 6 digits we need to avoid the alpha channel.
-  const rgb = content.replace(")", "").split(",");
+  const rgb = content.replace(')', '').split(',');
   if (rgb.length === 4) {
     rgb.pop();
   }
@@ -55,7 +53,7 @@ const rgbToHex = (content) => {
     hexadecimal = [a[0], b[0], c[0], ...rest];
   }
 
-  return `#${hexadecimal.join("")}`;
+  return `#${hexadecimal.join('')}`;
 };
 
 /**
@@ -72,8 +70,7 @@ const emToPx = (content) => `${Math.round(parseFloat(content) * 16)}px`;
  * @param {string} content - The content to convert
  * @return {string} - Returns the next structure `[number]em`
  */
-const pxToEm = (content) =>
-  `${Math.round((Number(content) / 16) * 1000) / 1000}em`;
+const pxToEm = (content) => `${Math.round((Number(content) / 16) * 1000) / 1000}em`;
 
 /**
  * Get the color equivalent on hexadecimals
@@ -90,16 +87,13 @@ const colorToHex = (content) => colors[content].toLowerCase();
  * @param {string} content - The content to convert
  * @return {string} - Returns the content cleaned
  */
-const cleanUnits = (content) => {
-  console.log(content);
-  return content.trim().replace(/rgb\(|rgba\(|#|rem|px|em|;/g, "");
-};
+const cleanUnits = (content) => content.trim().replace(/rgb\(|rgba\(|#|rem|px|em|;/g, '');
 
 const objFunc = {
   color: colorToHex,
   rgba: rgbToHex,
   rgb: rgbToHex,
-  "#": hexToRgb,
+  '#': hexToRgb,
   em: emToPx,
   px: pxToEm,
   rem: emToPx,
@@ -112,7 +106,7 @@ const obj = {
   },
 };
 
-if (process.env.NODE_ENV !== "production") {
+if (process.env.NODE_ENV !== 'production') {
   obj.colorToHex = colorToHex;
   obj.hexToRgb = hexToRgb;
   obj.rgbToHex = rgbToHex;
