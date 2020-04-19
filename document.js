@@ -20,7 +20,7 @@ const { ERROR_SELECTED_TEXT } = require('./helpers/constants/strings');
  * @param {string} textContent - Text to check
  * @return {boolean}
  */
-const isUnitsExits = (textContent) => /#[a-f\d]{3,6}|(rgb|rgba)\(|\d+px|[.\d]+(rem|em)/gi.test(textContent);
+const isUnitsExits = (textContent) => /#[a-f\d]{3,6}|rgb\(|rgba\(|\d+px|[.\d]+(rem|em)/gi.test(textContent);
 
 /**
  * It will get all the values in one line to convert
@@ -39,7 +39,7 @@ const getValuesAndUnits = (textContent) => {
   //   value: '000'
   // }
   return values.map((value) => {
-    const unit = value.trim().match(/^((rgb|rgba)\(|#)|(rem|px|em)+$/)[0];
+    const unit = value.trim().match(/rgb\(|rgba\(|#|rem|px|em/)[0];
 
     return {
       unit,
@@ -53,12 +53,12 @@ const getValuesAndUnits = (textContent) => {
  * It means a range of text selected with the cursor.
  *
  * @param {object} selection - An object will several values
- * @param {object} document - The actual document where we are workin on
+ * @param {object} document - The actual document where we are working on
  */
 const processSelectedRangeText = (selection, document) => {
   const { start, end } = selection;
 
-  // Get all the contenet from the selection
+  // Get all the content from the selection
   const textRange = new Range(
     start.line,
     start.character,
@@ -72,19 +72,19 @@ const processSelectedRangeText = (selection, document) => {
   const linesOfText = textToInspect.replace(/\r/g, '').split('\n');
 
   linesOfText
-    .filter((lines) => isUnitsExits(lines))
     .map((lines, index) => ({
       position: index,
       text: lines,
     }))
-    .forEach((lines) => {
-      getValuesAndUnits(lines.text).forEach((foundLine) => {
+    .filter(line => isUnitsExits(line.text))
+    .forEach((line) => {
+      getValuesAndUnits(line.text).forEach((foundLine) => {
         const convertedValue = Converter(
           cleanUnits(foundLine.value),
           foundLine.unit.replace('(', '')
         );
 
-        linesOfText[lines.position] = linesOfText[lines.position].replace(
+        linesOfText[line.position] = linesOfText[line.position].replace(
           foundLine.value,
           convertedValue
         );
