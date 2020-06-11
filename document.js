@@ -13,6 +13,8 @@ const colorValues = require('./helpers/colors');
 
 const { ERROR_SELECTED_TEXT } = require('./helpers/constants/strings');
 
+const REGEX_SELECTED_TEXT = /((rgb|rgba)\([\s\d,.]+\))|#[\d\w]{3,6}|(\d+(rem|px|em))/g;
+
 // -================= // =================-
 /**
  * Checks if there's any unit in the line
@@ -20,7 +22,8 @@ const { ERROR_SELECTED_TEXT } = require('./helpers/constants/strings');
  * @param {string} textContent - Text to check
  * @return {boolean}
  */
-const isUnitsExits = (textContent) => /#[a-f\d]{3,6}|rgb\(|rgba\(|\d+px|[.\d]+(rem|em)/gi.test(textContent);
+const isUnitsExits = (textContent) =>
+  /#[a-f\d]{3,6}|rgb\(|rgba\(|\d+px|[.\d]+(rem|em)/gi.test(textContent);
 
 /**
  * It will get all the values in one line to convert
@@ -76,7 +79,7 @@ const processSelectedRangeText = (selection, document) => {
       position: index,
       text: lines,
     }))
-    .filter(line => isUnitsExits(line.text))
+    .filter((line) => isUnitsExits(line.text))
     .forEach((line) => {
       getValuesAndUnits(line.text).forEach((foundLine) => {
         const convertedValue = Converter(
@@ -110,12 +113,8 @@ const processSingleLine = (selection, lineAt) => {
   let convertedValues = textToInspect;
   // Check if the selected text has a known unit.
   // Except for colors, they are not considered as units.
-  if (
-    /((rgb|rgba)\([\d,.]+\))|#[\d\w]{3,6}|(\d+(rem|px|em))/g.test(textToInspect)
-  ) {
-    const matchedValues = textToInspect.match(
-      /((rgb|rgba)\([\d,.]+\))|#[\d\w]{3,6}|(\d+(rem|px|em))/g
-    );
+  if (REGEX_SELECTED_TEXT.test(convertedValues)) {
+    const matchedValues = convertedValues.match(REGEX_SELECTED_TEXT);
 
     const valToConvert = matchedValues.reduce(
       (prev, current) => [
@@ -133,12 +132,12 @@ const processSingleLine = (selection, lineAt) => {
       val.newVal = Converter(cleanUnits(val.prevVal), val.unit);
 
       convertedValues = convertedValues.replace(
-        new RegExp(val.prevVal, 'g'),
+        new RegExp(val.prevVal.replace(/\(/, '\\(').replace(/\)/, '\\)'), 'g'),
         val.newVal
       );
     });
-  } else if (colorValues[textToInspect]) {
-    convertedValues = Converter(textToInspect, 'color');
+  } else if (colorValues[convertedValues]) {
+    convertedValues = Converter(convertedValues, 'color');
   } else {
     window.showErrorMessage(ERROR_SELECTED_TEXT);
   }

@@ -1,3 +1,7 @@
+## v 1.5.5
+* Fixed issue selecting rgba or rgb single values.
+* Updated some dependencies.
+
 ## v 1.5.3
 * Fixed issue selecting more than one value in a single line
 * Fixed issue selecting multiple values with different values.

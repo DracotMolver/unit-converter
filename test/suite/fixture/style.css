@@ -26,7 +26,7 @@ textarea {
   margin-bottom: 1.67em;
   box-sizing: border-box;
   resize: none;
-  border: 1px solid rgba(73, 83, 88, 0.6); }
+  border: 0.063em solid #495358; }
 
 video,
 img,
