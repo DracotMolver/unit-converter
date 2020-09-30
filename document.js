@@ -22,8 +22,7 @@ const REGEX_SELECTED_TEXT = /((rgb|rgba)\([\s\d,.]+\))|#[\d\w]{3,6}|(\d+(rem|px|
  * @param {string} textContent - Text to check
  * @return {boolean}
  */
-const isUnitsExits = (textContent) =>
-  /#[a-f\d]{3,6}|rgb\(|rgba\(|\d+px|[.\d]+(rem|em)/gi.test(textContent);
+const isUnitsExits = (textContent) => /#[a-f\d]{3,6}|rgb\(|rgba\(|\d+px|[.\d]+(rem|em)/gi.test(textContent);
 
 /**
  * It will get all the values in one line to convert

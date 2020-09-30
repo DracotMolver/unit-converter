@@ -14,7 +14,7 @@ const colors = require('./helpers/colors');
 const hexToRgb = (content) => {
   // 3 => [f, f, f]
   // 6 => [ff, ff, ff]
-  const hexadecimal = content.length > 3 ? content.match(/[a-f\d]{2}/g) : content.split('');
+  const hexadecimal = content.length > 3 ? content.match(/[a-f\d]{2}/ig) : content.split('');
 
   const rgba = hexadecimal
     .map((value) => String(parseInt(value.length === 2 ? value : `${value}${value}`, 16))

@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
  * @author Diego Alberto Molina Vera
  * @copyright 2016 - 2018
@@ -62,6 +63,7 @@ describe('Converter module', () => {
     const expected01 = 'rgba(255, 255, 255, 1) | rgb(255, 255, 255)';
     const expected02 = 'rgba(102, 255, 102, 1) | rgb(102, 255, 102)';
     const expected03 = 'rgba(230, 230, 0, 1) | rgb(230, 230, 0)';
+    const expected04 = 'rgba(244, 37, 52, 1) | rgb(244, 37, 52)';
 
     // after had been cleaned
     assert(hexToRgb('fff') === expected01);
@@ -72,7 +74,9 @@ describe('Converter module', () => {
     assert(hexToRgb(cleanUnits('   #66ff66  ')) === expected02);
     assert(hexToRgb(cleanUnits('#e6e600')) === expected03);
 
-    // // using as expected
+    assert(hexToRgb(cleanUnits('#F42534')) === expected04);
+
+    // using as expected
     assert(Converter(cleanUnits('#66ff66;'), '#') === expected02);
     assert(Converter(cleanUnits('#e6e600;'), '#') === expected03);
     assert(Converter(cleanUnits('#6f6;'), '#') === expected02);
